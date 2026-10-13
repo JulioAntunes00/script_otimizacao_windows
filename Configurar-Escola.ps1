@@ -24,6 +24,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     return
 }
 
+Clear-Host
 $Host.UI.RawUI.WindowTitle = "Configurador e Otimizador Escolar - Win10/Win11"
 $ProgressPreference = 'SilentlyContinue'
 
@@ -170,8 +171,8 @@ $protegidos = Get-Content $snapshotFile -ErrorAction SilentlyContinue
 
 $adminGroup = Get-LocalGroup | Where-Object { $_.SID -eq 'S-1-5-32-544' }
 $adminMembers = if ($adminGroup) { Get-LocalGroupMember -Group $adminGroup.Name -ErrorAction SilentlyContinue } else { @() }
-$adminSIDs = @($adminMembers.SID.Value)
-$adminNames = @($adminMembers.Name | ForEach-Object { $_.Split('\')[-1] })
+$adminSIDs = @($adminMembers | Where-Object { $_.SID } | ForEach-Object { $_.SID.Value })
+$adminNames = @($adminMembers | Where-Object { $_.Name } | ForEach-Object { $_.Name.Split('\')[-1] })
 
 $hoje = Get-Date
 $perfis = Get-CimInstance Win32_UserProfile -ErrorAction SilentlyContinue
@@ -225,8 +226,8 @@ function Gerenciar-PerfisInativos {
 
     $adminGroup = Get-LocalGroup | Where-Object { $_.SID -eq 'S-1-5-32-544' }
     $adminMembers = if ($adminGroup) { Get-LocalGroupMember -Group $adminGroup.Name -ErrorAction SilentlyContinue } else { @() }
-    $adminSIDs = @($adminMembers.SID.Value)
-    $adminNames = @($adminMembers.Name | ForEach-Object { $_.Split('\')[-1] })
+    $adminSIDs = @($adminMembers | Where-Object { $_.SID } | ForEach-Object { $_.SID.Value })
+    $adminNames = @($adminMembers | Where-Object { $_.Name } | ForEach-Object { $_.Name.Split('\')[-1] })
 
     $snapshotFile = "C:\ProgramData\EscolaConfig\perfis_protegidos.txt"
     $snapshotNomes = if (Test-Path $snapshotFile) { Get-Content $snapshotFile -ErrorAction SilentlyContinue } else { @() }
