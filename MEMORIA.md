@@ -187,3 +187,21 @@ Todas as 10 opções iniciam **desmarcadas (`[ ]`)** para escolha livre do técn
 9. **Supressão da Barra de Progresso Congelada do PowerShell (`$ProgressPreference`):**
    - **Diagnóstico:** Ao executar comandos de desinstalação de pacotes AppX (`Remove-AppxPackage`, como no `Microsoft.XboxApp`) ou downloads via Web, o PowerShell desenha nativamente uma barra de progresso no topo da tela (*"Progresso da operação de implantação: Microsoft.xboxapp_48..."*). Em consoles do Windows, essa barra frequentemente trava na tela e nunca mais sai do buffer visual, além de prejudicar a performance.
    - **Solução:** Configurado `$ProgressPreference = 'SilentlyContinue'` no início do script e no bloco 3.6. Isso silencia totalmente essa barra gráfica interna do PowerShell, mantendo o terminal limpo e acelerando substancialmente a execução dos comandos AppX.
+
+10. **Blindagem e Gestão Inteligente de Perfis de Alunos:**
+    - **Varredura de Inatividade (> 2 meses / 60 dias):** Executada na inicialização da instalação ou diretamente pela Opção [5] do Menu Principal. Exibe confirmação visual `[OK]` mesmo quando nenhum perfil inativo for detectado, e abre menu interativo com caixas `[X]` pré-selecionadas caso encontre perfis aptos a remoção.
+    - **Lista Branca Rígida (Intocáveis):** Nenhuma conta de Administrador (membro de Administradores ou SID `-500`), sessões ativas (`Loaded`), perfis especiais (`Special`), contas padrão (`alunos`, `BlueLab`), contas de escolas (`ARACATUBA*`), clones locais (`alunos.DESKTOP*`) ou contas registradas no snapshot inicial pode ser tocada.
+    - **Snapshot Inicial & Manutenção Semanal Automatizada:** No momento da primeira configuração, o script salva a "foto" dos usuários existentes em `C:\ProgramData\EscolaConfig\perfis_protegidos.txt` e cria uma Tarefa Agendada no Windows (`LimpezaPerfisAlunos`) que roda semanalmente para expurgar silenciosamente novos perfis de alunos que ficarem mais de 7 dias sem login, poupando espaço de discos eMMC e SSDs.
+
+11. **Canal de Feedback e Relato de Problemas (Google Forms via HTTP POST):**
+    - **Envio Direto sem Navegador:** O técnico pode reportar bugs ou enviar ideias de melhoria pelo terminal (Opção [7] / atalho `R`), informando Tipo, Mensagem e identificação opcional (Nome/Cidade).
+    - **Diagnóstico Automático:** O script anexa automaticamente a versão do Windows, memória RAM, capacidade/espaço livre do disco e nome do computador.
+    - **Privacidade e Sigilo:** As respostas são enviadas silenciosamente para o endpoint `/formResponse` do Google Forms e gravadas em tempo real na planilha do desenvolvedor. A interface no terminal oculta completamente qualquer menção ao Google Forms ou Google Sheets, exibindo apenas mensagens neutras de status.
+
+12. **Métricas Dinâmicas de Armazenamento ("Antes e Depois"):**
+    - **Recálculo em Tempo Real:** A função `Atualizar-MetricasDisco` é chamada a cada renderização do Menu Principal, recalculando o espaço livre de `C:` e a capacidade total.
+    - **Destaque Visual:** Compara com o espaço inicial medido na abertura do script e exibe em verde no cabeçalho o ganho obtido (ex: `+7.4 GB liberados`), além de refletir a expansão da partição após a liberação da partição de recuperação.
+
+13. **Versionamento e Repositório Oficial no GitHub:**
+    - **Repositório:** [https://github.com/JulioAntunes00/script_otimizacao_windows](https://github.com/JulioAntunes00/script_otimizacao_windows)
+    - **Regras de Exclusão (`.gitignore`):** Backups legados manuais (`*.bak`, `*_backup*.ps1`) e logs temporários são ignorados. Todo o versionamento histórico é gerenciado com commits atômicos no Git, dispensando arquivos duplicados no computador.

@@ -79,6 +79,25 @@ Ao abrir o script, você verá o **Menu Principal**:
 
 ---
 
+## 🛠️ Recursos Adicionais do Menu
+
+### [5] Limpar Perfis de Alunos Inativos (> 2 meses)
+- **Varredura Segura:** Identifica perfis institucionais de alunos inativos há mais de 60 dias.
+- **Seleção Interativa:** Apresenta lista com caixas `[X]` pré-marcadas, permitindo desmarcar qualquer aluno que desejar poupar antes da exclusão.
+- **Blindagem:** Administradores, perfis de sistema, contas `alunos`, `BlueLab` e escolas (`ARACATUBA*`) são 100% imunes.
+
+### [7] Reportar Problema ou Sugerir Melhoria
+- Permite ao técnico relatar erros de execução ou enviar ideias de melhoria diretamente do terminal.
+- Coleta opcionalmente Nome e Cidade/Escola e anexa diagnóstico de hardware (Windows, RAM, espaço em disco) de forma segura e transparente.
+
+---
+
 ## 🚀 Como Executar
 1. Clique com o botão direito no arquivo `Configurar-Escola.ps1` e selecione **Executar com o PowerShell**.
 2. O script exige privilégios de **Administrador**. Se executado sem permissão, ele solicita automaticamente a elevação de privilégios pelo UAC.
+
+---
+
+## 📦 Repositório Oficial e Versionamento
+Código-fonte, controle de versão e melhorias disponíveis no GitHub:
+🔗 [https://github.com/JulioAntunes00/script_otimizacao_windows](https://github.com/JulioAntunes00/script_otimizacao_windows)
