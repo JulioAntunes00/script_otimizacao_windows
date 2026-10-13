@@ -1,5 +1,6 @@
 # 📋 Plano de Melhorias: Script de Configuração Escolar (Windows 10/11)
 
+> **Autor:** Julio Antunes ([@JulioAntunes00](https://github.com/JulioAntunes00))  
 > **Cenário de Execução:** Notebooks de escolas públicas (governo / Azure AD / Intune), executado via Web (`irm ... | iex`) ou pendrive. Utilizado tanto em formatações do zero quanto em manutenção de máquinas que já estão em uso.
 > **Hardware Típico:** eMMC 32GB, eMMC 64GB e SSD M.2 SATA 128GB+ (Windows 10 e Windows 11).
 

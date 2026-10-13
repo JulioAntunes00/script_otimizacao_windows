@@ -6,6 +6,10 @@
     Otimiza desempenho de CPU e RAM, bloqueia aplicativos/jogos/VPNs indesejados, 
     permite desativar a busca web do Bing no Menu Iniciar isoladamente, alivia desgaste em discos eMMC,
     protege atalhos da Area de Trabalho, ajusta politicas de energia e instala o NetTime.
+.AUTHOR
+    Julio Antunes (@JulioAntunes00)
+.LINK
+    https://github.com/JulioAntunes00/script_otimizacao_windows
 #>
 
 # =====================================================================
@@ -1523,6 +1527,7 @@ function Menu-Principal {
         }
         
         Write-Host "`n Ou pressione o numero/letra correspondente no teclado." -ForegroundColor DarkGray
+        Write-Host " [i] Desenvolvido por: Julio Antunes | github.com/JulioAntunes00" -ForegroundColor DarkCyan
 
         $key = [Console]::ReadKey($true)
         $char = ""

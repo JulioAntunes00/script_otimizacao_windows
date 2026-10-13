@@ -101,3 +101,10 @@ Ao abrir o script, você verá o **Menu Principal**:
 ## 📦 Repositório Oficial e Versionamento
 Código-fonte, controle de versão e melhorias disponíveis no GitHub:
 🔗 [https://github.com/JulioAntunes00/script_otimizacao_windows](https://github.com/JulioAntunes00/script_otimizacao_windows)
+
+---
+
+## 👨‍💻 Autor
+Desenvolvido por **Julio Antunes**
+* GitHub: [@JulioAntunes00](https://github.com/JulioAntunes00)
+* Repositório: [script_otimizacao_windows](https://github.com/JulioAntunes00/script_otimizacao_windows)
