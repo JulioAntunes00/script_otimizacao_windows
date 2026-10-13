@@ -246,7 +246,7 @@ function Gerenciar-PerfisInativos {
 
         if ($dataUso) {
             $dias = [math]::Floor(($hoje - $dataUso).TotalDays)
-            if ($dias -ge 60) {
+            if ($dias -ge 30) {
                 $uName = Split-Path -Path $p.LocalPath -Leaf
                 
                 # Tamanho aproximado
@@ -271,11 +271,11 @@ function Gerenciar-PerfisInativos {
 
     if ($candidatos.Count -eq 0) {
         if (-not $SilenciosoSeVazio) {
-            Write-Host " -> Nenhum perfil de aluno inativo (> 2 meses) encontrado." -ForegroundColor Green
+            Write-Host " -> Nenhum perfil de aluno inativo (> 1 mes) encontrado." -ForegroundColor Green
             Write-Host "`nPressione Enter para voltar ao menu principal..."
             Read-Host
         } else {
-            Write-Step -Text "Verificacao de perfis inativos (> 2 meses): Nenhum encontrado" -Status "OK"
+            Write-Step -Text "Verificacao de perfis inativos (> 1 mes): Nenhum encontrado" -Status "OK"
         }
         return
     }
@@ -285,7 +285,7 @@ function Gerenciar-PerfisInativos {
     Write-Host "=====================================================================" -ForegroundColor Yellow
     Write-Host "            AVISO: PERFIS DE USUARIOS INATIVOS ENCONTRADOS           " -ForegroundColor Yellow
     Write-Host "=====================================================================" -ForegroundColor Yellow
-    Write-Host " Foram detectados $($candidatos.Count) perfil(is) de aluno inativo(s) ha mais de 2 meses (60 dias)." -ForegroundColor Yellow
+    Write-Host " Foram detectados $($candidatos.Count) perfil(is) de aluno inativo(s) ha mais de 1 mes (30 dias)." -ForegroundColor Yellow
     Write-Host " Administradores, BlueLab, alunos e contas da escola estao 100% protegidos." -ForegroundColor Green
     Write-Host "=====================================================================`n" -ForegroundColor Yellow
     Write-Host " [D] Deletar perfis inativos (Abre lista para selecionar com caixas [X])" -ForegroundColor Cyan
@@ -404,7 +404,7 @@ function Executar-Tarefas {
     Write-Host "                 INICIANDO APLICACAO DE MELHORIAS                    " -ForegroundColor Cyan
     Write-Host "=====================================================================" -ForegroundColor Cyan
 
-    # Verificar perfis inativos ha mais de 2 meses (60 dias) com confirmacao/selecao
+    # Verificar perfis inativos ha mais de 1 mes (30 dias) com confirmacao/selecao
     Gerenciar-PerfisInativos -SilenciosoSeVazio
 
     # Ativar regra de manutencao automatica de perfis e registrar snapshot seguro
@@ -1286,7 +1286,7 @@ function Mostrar-Ajuda {
     Write-Host "    Elimina buscas e sugestoes da internet no Iniciar, deixando a pesquisa instantanea e leve."
     Write-Host ""
     Write-Host "[*] Manutencao e Limpeza de Perfis de Alunos:" -ForegroundColor Yellow
-    Write-Host "    Identifica contas de alunos com login institucional inativas ha mais de 2 meses."
+    Write-Host "    Identifica contas de alunos com login institucional inativas ha mais de 1 mes."
     Write-Host "    Permite selecao individual por caixas [X] para remocao definitiva de perfis pesados."
     Write-Host "    Contas de Administrador, BlueLab, 'alunos' e escolas sao 100% blindadas e protegidas."
     Write-Host "    Ao configurar contas, ativa tarefa agendada semanal para manter o PC sempre limpo."
@@ -1478,7 +1478,7 @@ function Menu-Principal {
         "[2] Instalacao Personalizada (Selecao por caixas [X])",
         "[3] Liberar Particao de Recuperacao (eMMC 32GB)",
         "[4] Diagnostico de Hardware (Bateria, Disco, CPU, Uptime)",
-        "[5] Limpar Perfis de Alunos Inativos (> 2 meses)",
+        "[5] Limpar Perfis de Alunos Inativos (> 1 mes)",
         "[6] Desfazer / Reverter Alteracoes",
         "[7] Reportar Problema ou Sugerir Melhoria",
         "[H] Ajuda (Detalhes de cada opcao)",

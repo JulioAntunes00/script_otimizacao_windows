@@ -11,7 +11,7 @@ Ao abrir o script, você verá o **Menu Principal**:
 * **[2] Personalizar Configuração:** Permite selecionar individualmente quais das 10 opções aplicar (inicia com todas as caixas desmarcadas `[ ]` para maior controle).
 * **[3] Liberar Partição de Recuperação:** Exclusivo para notebooks com eMMC de 32GB (exclui a partição OEM de fábrica e expande o disco C: em 8 a 14 GB).
 * **[4] Diagnóstico de Hardware:** Analisa a saúde da bateria, vida útil do armazenamento (SSD/eMMC), temperatura e tempo ligado (uptime).
-* **[5] Limpar Perfis de Alunos Inativos:** Verifica perfis de alunos com login institucional inativos há mais de 2 meses (60 dias) e abre tela interativa com caixas `[X]` para exclusão seletiva, liberando gigabytes de cache sem tocar em contas de administradores ou do sistema.
+* **[5] Limpar Perfis de Alunos Inativos:** Verifica perfis de alunos com login institucional inativos há mais de 1 mês (30 dias) e abre tela interativa com caixas `[X]` para exclusão seletiva, liberando gigabytes de cache sem tocar em contas de administradores ou do sistema.
 * **[6] Desfazer / Reverter Alterações:** Reabilita os serviços e remove os bloqueios aplicados caso precise voltar atrás.
 * **[7] Reportar Problema ou Sugerir Melhoria:** Permite enviar feedbacks, relatos de erros e sugestões diretamente do terminal para a equipe de suporte e desenvolvimento.
 * **[H] Ajuda:** Explicação resumida de cada item na própria tela.
@@ -81,8 +81,8 @@ Ao abrir o script, você verá o **Menu Principal**:
 
 ## 🛠️ Recursos Adicionais do Menu
 
-### [5] Limpar Perfis de Alunos Inativos (> 2 meses)
-- **Varredura Segura:** Identifica perfis institucionais de alunos inativos há mais de 60 dias.
+### [5] Limpar Perfis de Alunos Inativos (> 1 mes)
+- **Varredura Segura:** Identifica perfis institucionais de alunos inativos há mais de 30 dias.
 - **Seleção Interativa:** Apresenta lista com caixas `[X]` pré-marcadas, permitindo desmarcar qualquer aluno que desejar poupar antes da exclusão.
 - **Blindagem:** Administradores, perfis de sistema, contas `alunos`, `BlueLab` e escolas (`ARACATUBA*`) são 100% imunes.
 

@@ -22,7 +22,7 @@
 | **Eixo de Desempenho** | Desativar GameDVR, limpar `SoftwareDistribution` e `Prefetch`, cortar telemetria/SysMain, desativar transparência e **ocultar Widgets/Feeds**. | ✅ Aprovado |
 | **Bloqueios de Jogos, VPNs e Apps** | Bloquear **Minecraft**, **Roblox**, **Google Play Games**, **UltraSurf**, **Psiphon**, **todas as principais VPNs**, restrição de conexões VPN no Windows e navegadores paralelos (**Opera, Brave**). *(Netflix e Clipchamp mantidos)*. | ✅ Aprovado |
 | **Partição de Recuperação (32GB)** | Isolada **apenas no Menu Principal (Opção 3)** com confirmação `[S/N]` e trava de segurança para eMMC de 32GB, evitando cliques acidentais no menu personalizado. | ✅ Aprovado |
-| **Limpeza e Gestão de Perfis de Alunos** | Identifica contas de alunos com login institucional inativas há mais de **2 meses (60 dias)** com alerta interativo e seleção por caixas `[X]` (iniciando todas marcadas para exclusão, com opção de desmarcar). Blindagem total de **Administradores, BlueLab, alunos, ARACATUBA\* e alunos.DESKTOP\***. Snapshot inicial de contas no dia da configuração e **tarefa agendada semanal** para remover perfis novos inativos há mais de **7 dias**. | ✅ Implementado & Blindado |
+| **Limpeza e Gestão de Perfis de Alunos** | Identifica contas de alunos com login institucional inativas há mais de **1 mês (30 dias)** com alerta interativo e seleção por caixas `[X]` (iniciando todas marcadas para exclusão, com opção de desmarcar). Blindagem total de **Administradores, BlueLab, alunos, ARACATUBA\* e alunos.DESKTOP\***. Snapshot inicial de contas no dia da configuração e **tarefa agendada semanal** para remover perfis novos inativos há mais de **7 dias**. | ✅ Implementado & Blindado |
 | **Navegação Contínua & Armazenamento Dinâmico** | Ao concluir tarefas, o script retorna ao Menu Principal sem fechar e **recalcula o disco em tempo real**, exibindo o ganho em verde (ex: `+6.6 GB liberados`). | ✅ Implementado Dinâmico |
 | **Reporte de Problemas & Sugestões** | Envia relatos do técnico diretamente do terminal para uma planilha do **Google Sheets (via Google Forms POST silencioso)** com identificação opcional e diagnóstico automático de hardware. | ✅ Implementado |
 | **Opção de Reverter / Desfazer** | Restaura o computador ao estado original (para notebooks pessoais rodados por engano). | ✅ Aprovado |
@@ -49,7 +49,7 @@
     [2] Instalacao Personalizada (Selecao por caixas [X])
     [3] Liberar Particao de Recuperacao (eMMC 32GB)
     [4] Diagnostico de Hardware (Bateria, Disco, CPU, Uptime)
-    [5] Limpar Perfis de Alunos Inativos (> 2 meses)
+    [5] Limpar Perfis de Alunos Inativos (> 1 mes)
     [6] Desfazer / Reverter Alteracoes
     [7] Reportar Problema ou Sugerir Melhoria
     [H] Ajuda (Detalhes de cada opcao)
@@ -190,7 +190,7 @@ Todas as 10 opções iniciam **desmarcadas (`[ ]`)** para escolha livre do técn
    - **Solução:** Configurado `$ProgressPreference = 'SilentlyContinue'` no início do script e no bloco 3.6. Isso silencia totalmente essa barra gráfica interna do PowerShell, mantendo o terminal limpo e acelerando substancialmente a execução dos comandos AppX.
 
 10. **Blindagem e Gestão Inteligente de Perfis de Alunos:**
-    - **Varredura de Inatividade (> 2 meses / 60 dias):** Executada na inicialização da instalação ou diretamente pela Opção [5] do Menu Principal. Exibe confirmação visual `[OK]` mesmo quando nenhum perfil inativo for detectado, e abre menu interativo com caixas `[X]` pré-selecionadas caso encontre perfis aptos a remoção.
+    - **Varredura de Inatividade (> 1 mês / 30 dias):** Executada na inicialização da instalação ou diretamente pela Opção [5] do Menu Principal. Exibe confirmação visual `[OK]` mesmo quando nenhum perfil inativo for detectado, e abre menu interativo com caixas `[X]` pré-selecionadas caso encontre perfis aptos a remoção.
     - **Lista Branca Rígida (Intocáveis):** Nenhuma conta de Administrador (membro de Administradores ou SID `-500`), sessões ativas (`Loaded`), perfis especiais (`Special`), contas padrão (`alunos`, `BlueLab`), contas de escolas (`ARACATUBA*`), clones locais (`alunos.DESKTOP*`) ou contas registradas no snapshot inicial pode ser tocada.
     - **Snapshot Inicial & Manutenção Semanal Automatizada:** No momento da primeira configuração, o script salva a "foto" dos usuários existentes em `C:\ProgramData\EscolaConfig\perfis_protegidos.txt` e cria uma Tarefa Agendada no Windows (`LimpezaPerfisAlunos`) que roda semanalmente para expurgar silenciosamente novos perfis de alunos que ficarem mais de 7 dias sem login, poupando espaço de discos eMMC e SSDs.
 
