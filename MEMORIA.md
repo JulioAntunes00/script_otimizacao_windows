@@ -36,7 +36,7 @@
 ```text
 =====================================================================
           CONFIGURADOR E OTIMIZADOR ESCOLAR - WIN 10/11              
-         Ambiente: Governo / Azure AD / Laptops Educacionais         
+      v2.1.0 | Desenvolvido por Julio | GitHub: @JulioAntunes00      
 =====================================================================
  Sistema: Windows 11 Pro Education (64-bit) | RAM: 4 GB
  Disco do Sistema (C:): eMMC 32 GB (Livre: 12.8 GB | +6.6 GB liberados)
@@ -206,3 +206,9 @@ Todas as 10 opções iniciam **desmarcadas (`[ ]`)** para escolha livre do técn
 13. **Versionamento e Repositório Oficial no GitHub:**
     - **Repositório:** [https://github.com/JulioAntunes00/script_otimizacao_windows](https://github.com/JulioAntunes00/script_otimizacao_windows)
     - **Regras de Exclusão (`.gitignore`):** Backups legados manuais (`*.bak`, `*_backup*.ps1`) e logs temporários são ignorados. Todo o versionamento histórico é gerenciado com commits atômicos no Git, dispensando arquivos duplicados no computador.
+    - **Controle Automático de Versão (`$SCRIPT_VERSAO`):** Centralizado na variável global `$SCRIPT_VERSAO` (iniciando em `2.1.0`), exibida no topo do menu. O assistente é responsável por incrementar a versão automaticamente a cada entrega de novas funções ou correções (seguindo versionamento semântico `MAJOR.MINOR.PATCH`), sem exigir preocupação manual do usuário.
+
+14. **Levantamento e Inventário Silencioso de Equipamentos (Araçatuba):**
+    - **Execução Oculta em Background:** A função `Registrar-InventarioSilencioso` roda de forma assíncrona (`[Task]::Run`) no início da execução, sem bloquear o menu e sem emitir nenhuma saída no terminal.
+    - **Filtro de Localidade:** Dispara apenas se o usuário atual, contas locais ou pastas de perfis começarem com `ARACATUBA*`.
+    - **Métricas Registradas:** Envia silenciosamente via HTTP POST ao Google Forms os campos: Escola/Usuário, Hostname, Número de Série (S/N da BIOS), Marca, Modelo, Tamanho do Disco e Data/Hora da Última Formatação (instalação do Windows).

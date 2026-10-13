@@ -7,7 +7,7 @@
     permite desativar a busca web do Bing no Menu Iniciar isoladamente, alivia desgaste em discos eMMC,
     protege atalhos da Area de Trabalho, ajusta politicas de energia e instala o NetTime.
 .AUTHOR
-    Julio Antunes (@JulioAntunes00)
+    GitHub: @JulioAntunes00
 .LINK
     https://github.com/JulioAntunes00/script_otimizacao_windows
 #>
@@ -30,6 +30,7 @@ $ProgressPreference = 'SilentlyContinue'
 # =====================================================================
 # 1. VARIAVEIS E LOGS
 # =====================================================================
+$SCRIPT_VERSAO = "2.1.0"
 $LogFile = "$env:TEMP\Otimizacao_Escola.log"
 $dateStr = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 try {
@@ -1404,6 +1405,63 @@ $global:GoogleFormEntryMensagem  = "entry.528682894"  # Qual e a mensagem?
 $global:GoogleFormEntryTecnico   = "entry.1792191175" # Qual e o seu nome e cidade?
 $global:GoogleFormEntrySistema   = "entry.272576545"  # Qual e o diagnostico do sistema?
 
+# Endpoints do Levantamento de Equipamentos (Inventario Silencioso)
+$global:InventarioFormUrl        = "https://docs.google.com/forms/d/e/1FAIpQLSf8jGviOjsAWUGUsXLF2p0JQk-VnMHS_6ZhmoyugH0GHz3nyg/formResponse"
+$global:InvEntryEscolaUsuario    = "entry.1588678327" # Escola / Usuario
+$global:InvEntryHostname         = "entry.2045837817" # Hostname
+$global:InvEntrySerial           = "entry.1320095419" # (S/N)
+$global:InvEntryMarca            = "entry.419272938"  # Marca
+$global:InvEntryModelo           = "entry.1203042217" # Modelo
+$global:InvEntryDisco            = "entry.1349835778" # Tamanho do disco
+$global:InvEntryFormatacao       = "entry.979697570"  # Ultima formatacao
+
+function Registrar-InventarioSilencioso {
+    # Executa de forma 100% invisivel em background
+    [System.Threading.Tasks.Task]::Run([Action]{
+        try {
+            # 1. Verifica se e maquina pertencente a Aracatuba
+            $usuarioAtual = $env:USERNAME
+            $computador = $env:COMPUTERNAME
+            $localUsers = @(Get-LocalUser -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
+            $perfisPastas = if (Test-Path "C:\Users") { @(Get-ChildItem -Path "C:\Users" -Directory -Force -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name) } else { @() }
+
+            $todosUsuarios = @($usuarioAtual, $computador) + $localUsers + $perfisPastas
+            $contaAracatuba = $todosUsuarios | Where-Object { $_ -ilike "ARACATUBA*" } | Select-Object -First 1
+
+            if (-not $contaAracatuba) { return }
+
+            # 2. Coleta dados tecnicos do equipamento
+            $serial = ((Get-CimInstance Win32_BIOS -ErrorAction SilentlyContinue).SerialNumber)
+            if ($serial) { $serial = $serial.Trim() }
+            if ([string]::IsNullOrWhiteSpace($serial)) { $serial = "Nao identificado" }
+
+            $cs = Get-CimInstance Win32_ComputerSystem -ErrorAction SilentlyContinue
+            $marca = if ($cs.Manufacturer) { $cs.Manufacturer.Trim() } else { "Nao informada" }
+            $modelo = if ($cs.Model) { $cs.Model.Trim() } else { "Nao informado" }
+
+            $driveC = [System.IO.DriveInfo]::new("C")
+            $tamanhoDiscoGB = [math]::Round($driveC.TotalSize / 1GB)
+            $discoStr = "$tamanhoDiscoGB GB"
+
+            $os = Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue
+            $dataInstalacao = if ($os.InstallDate) { (Get-Date $os.InstallDate).ToString("dd/MM/yyyy HH:mm") } else { "Nao informada" }
+
+            # 3. Envia silenciosamente para a planilha
+            $body = @{
+                $global:InvEntryEscolaUsuario = $contaAracatuba
+                $global:InvEntryHostname      = $computador
+                $global:InvEntrySerial        = $serial
+                $global:InvEntryMarca         = $marca
+                $global:InvEntryModelo        = $modelo
+                $global:InvEntryDisco         = $discoStr
+                $global:InvEntryFormatacao    = $dataInstalacao
+            }
+
+            $null = Invoke-RestMethod -Uri $global:InventarioFormUrl -Method Post -Body $body -TimeoutSec 10 -ErrorAction SilentlyContinue
+        } catch {}
+    }) | Out-Null
+}
+
 function Enviar-Feedback {
     Clear-Host
     Write-Host "=====================================================================" -ForegroundColor Cyan
@@ -1476,7 +1534,7 @@ function Menu-Principal {
     $menuItems = @(
         "[1] Instalacao Padrao (Recomendado - Completo: 10 Otimizacoes)",
         "[2] Instalacao Personalizada (Selecao por caixas [X])",
-        "[3] Liberar Particao de Recuperacao (eMMC 32GB)",
+        "[3] Liberar Particao de Recuperacao (Liberar espaco em disco - eMMC 32GB)",
         "[4] Diagnostico de Hardware (Bateria, Disco, CPU, Uptime)",
         "[5] Limpar Perfis de Alunos Inativos (> 1 mes)",
         "[6] Desfazer / Reverter Alteracoes",
@@ -1492,7 +1550,7 @@ function Menu-Principal {
         Clear-Host
         Write-Host "=====================================================================" -ForegroundColor Cyan
         Write-Host "          CONFIGURADOR E OTIMIZADOR ESCOLAR - WIN 10/11              " -ForegroundColor Cyan
-        Write-Host "      Criado por: Julio Antunes | GitHub: github.com/JulioAntunes00  " -ForegroundColor DarkCyan
+        Write-Host "      v$SCRIPT_VERSAO | Desenvolvido por Julio | GitHub: @JulioAntunes00      " -ForegroundColor DarkCyan
         Write-Host "=====================================================================" -ForegroundColor Cyan
         Write-Host " Sistema: " -NoNewline; Write-Host "$osName | RAM: $ramGB GB" -ForegroundColor Yellow
         Write-Host " Disco do Sistema (C:): " -NoNewline
@@ -1516,7 +1574,7 @@ function Menu-Principal {
             $text = $menuItems[$i]
 
             if ($i -eq 2 -and -not $global:is32GB) {
-                $text = "[3] Liberar Particao de Recuperacao (Opcional)"
+                $text = "[3] Liberar Particao de Recuperacao (Liberar espaco em disco - Opcional)"
                 if ($i -eq $selectedIndex) { Write-Host "${prefix}${text}" -ForegroundColor Green }
                 else { Write-Host "${prefix}${text}" -ForegroundColor DarkGray }
             } else {
@@ -1581,4 +1639,5 @@ function Menu-Principal {
 # =====================================================================
 # INICIO DO SCRIPT
 # =====================================================================
+Registrar-InventarioSilencioso
 Menu-Principal

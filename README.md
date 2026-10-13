@@ -9,7 +9,7 @@ Este script foi desenvolvido especificamente para padronizar, otimizar e protege
 Ao abrir o script, você verá o **Menu Principal**:
 * **[1] Instalação Padrão:** Executa o pacote completo de melhorias recomendadas (opções de 1 a 10) de uma só vez (com verificação automática de perfis inativos).
 * **[2] Personalizar Configuração:** Permite selecionar individualmente quais das 10 opções aplicar (inicia com todas as caixas desmarcadas `[ ]` para maior controle).
-* **[3] Liberar Partição de Recuperação:** Exclusivo para notebooks com eMMC de 32GB (exclui a partição OEM de fábrica e expande o disco C: em 8 a 14 GB).
+* **[3] Liberar Partição de Recuperação (Liberar espaço em disco):** Exclusivo para notebooks com eMMC de 32GB (exclui a partição OEM de fábrica e expande o disco C: em 8 a 14 GB).
 * **[4] Diagnóstico de Hardware:** Analisa a saúde da bateria, vida útil do armazenamento (SSD/eMMC), temperatura e tempo ligado (uptime).
 * **[5] Limpar Perfis de Alunos Inativos:** Verifica perfis de alunos com login institucional inativos há mais de 1 mês (30 dias) e abre tela interativa com caixas `[X]` para exclusão seletiva, liberando gigabytes de cache sem tocar em contas de administradores ou do sistema.
 * **[6] Desfazer / Reverter Alterações:** Reabilita os serviços e remove os bloqueios aplicados caso precise voltar atrás.
