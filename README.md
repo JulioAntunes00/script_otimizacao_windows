@@ -14,7 +14,7 @@ Ao abrir o script, você verá o **Menu Principal**:
 * **[5] Limpar Perfis de Alunos Inativos:** Verifica perfis de alunos com login institucional inativos há mais de 1 mês (30 dias) e abre tela interativa com caixas `[X]` para exclusão seletiva, liberando gigabytes de cache sem tocar em contas de administradores ou do sistema.
 * **[6] Desfazer / Reverter Alterações:** Reabilita os serviços e remove os bloqueios aplicados caso precise voltar atrás.
 * **[7] Reportar Problema ou Sugerir Melhoria:** Permite enviar feedbacks, relatos de erros e sugestões diretamente do terminal para a equipe de suporte e desenvolvimento.
-* **[H] Ajuda:** Explicação resumida de cada item na própria tela.
+* **[H] Funções do Script:** Guia completo e detalhado de todas as 10 otimizações e recursos do menu diretamente na tela.
 * **[0] Sair:** Fecha o script e encerra a janela.
 
 ---

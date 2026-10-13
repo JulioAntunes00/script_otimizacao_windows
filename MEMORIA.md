@@ -36,7 +36,7 @@
 ```text
 =====================================================================
           CONFIGURADOR E OTIMIZADOR ESCOLAR - WIN 10/11              
-      v2.1.0 | Desenvolvido por Julio | GitHub: @JulioAntunes00      
+      v2.2.0 | Desenvolvido por Julio | GitHub: @JulioAntunes00      
 =====================================================================
  Sistema: Windows 11 Pro Education (64-bit) | RAM: 4 GB
  Disco do Sistema (C:): eMMC 32 GB (Livre: 12.8 GB | +6.6 GB liberados)
@@ -47,12 +47,12 @@
 
  -> [1] Instalacao Padrao (Recomendado - Completo: 10 Otimizacoes)
     [2] Instalacao Personalizada (Selecao por caixas [X])
-    [3] Liberar Particao de Recuperacao (eMMC 32GB)
+    [3] Liberar Particao de Recuperacao (Liberar espaco em disco - eMMC 32GB)
     [4] Diagnostico de Hardware (Bateria, Disco, CPU, Uptime)
     [5] Limpar Perfis de Alunos Inativos (> 1 mes)
     [6] Desfazer / Reverter Alteracoes
     [7] Reportar Problema ou Sugerir Melhoria
-    [H] Ajuda (Detalhes de cada opcao)
+    [H] Funcoes do Script (Guia de operacao e detalhes)
     [0] Sair
 
  Ou pressione o numero/letra correspondente no teclado.

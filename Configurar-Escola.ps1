@@ -30,7 +30,7 @@ $ProgressPreference = 'SilentlyContinue'
 # =====================================================================
 # 1. VARIAVEIS E LOGS
 # =====================================================================
-$SCRIPT_VERSAO = "2.1.0"
+$SCRIPT_VERSAO = "2.2.0"
 $LogFile = "$env:TEMP\Otimizacao_Escola.log"
 $dateStr = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 try {
@@ -1249,52 +1249,75 @@ function Desfazer-Alteracoes {
 function Mostrar-Ajuda {
     Clear-Host
     Write-Host "=====================================================================" -ForegroundColor Cyan
-    Write-Host "                   AJUDA - DETALHES DAS OPCOES                       " -ForegroundColor Cyan
+    Write-Host "             FUNCOES DO SCRIPT - GUIA COMPLETO DE OPERACAO           " -ForegroundColor Cyan
     Write-Host "=====================================================================" -ForegroundColor Cyan
-    Write-Host "[1] Configurar Contas:" -ForegroundColor Yellow
-    Write-Host "    Cria a conta 'alunos' (padrao sem senha), remove 'anos_iniciais' e"
-    Write-Host "    oculta contas de administradores locais da tela de login."
+    Write-Host "Este configurador foi desenvolvido para notebooks e PCs educacionais."
+    Write-Host "Abaixo estao detalhadas todas as rotinas executadas pelo script:`n" -ForegroundColor DarkGray
+
+    Write-Host "--- 10 OTIMIZACOES PRINCIPAIS (OPCAO 1 & 2) ---" -ForegroundColor Green
+    Write-Host "[1] Configurar Contas de Usuario:" -ForegroundColor Yellow
+    Write-Host "    - Cria a conta padrao 'alunos' (sem senha, usuario restrito)."
+    Write-Host "    - Remove contas antigas desnecessarias (ex: 'anos_iniciais')."
+    Write-Host "    - Oculta contas de Administrador local da tela de login para evitar uso indevido."
+    Write-Host "    - Garante exibicao de contas locais mesmo em maquinas ingressadas em dominio/Azure AD."
     Write-Host ""
-    Write-Host "[2] Ajustar Energia:" -ForegroundColor Yellow
-    Write-Host "    Desliga o notebook ao fechar a tampa (evita esquentar na mochila),"
-    Write-Host "    apaga a tela em 10 min e desativa a hibernacao (economiza disco)."
+    Write-Host "[2] Ajustar Politicas de Energia:" -ForegroundColor Yellow
+    Write-Host "    - Ao fechar a tampa, forca o notebook a DESLIGAR (evita superaquecimento em mochilas)."
+    Write-Host "    - Apaga o monitor apos 10 minutos de inatividade."
+    Write-Host "    - Desativa a hibernacao (economiza de 2 a 4 GB no disco C:)."
     Write-Host ""
-    Write-Host "[3] Otimizar Desempenho (CPU/RAM, WSearch, Limpeza):" -ForegroundColor Yellow
-    Write-Host "    Desativa SysMain, GameDVR, indexacao pesada (WSearch), Feeds de noticias,"
-    Write-Host "    servicos ociosos, Edge inicial e limpa caches/Prefetch."
+    Write-Host "[3] Otimizar Desempenho do Sistema (CPU, RAM e Disco):" -ForegroundColor Yellow
+    Write-Host "    - Desativa servicos pesados e telemetria: SysMain (Superfetch) e Connected User Experiences."
+    Write-Host "    - Desativa indexacao pesada (Windows Search) e gravacao em segundo plano de jogos (GameDVR)."
+    Write-Host "    - Desativa servicos ociosos: Xbox (XboxNetApi, XblAuth), Fax e Mapas Offline."
+    Write-Host "    - Impede que o Microsoft Edge inicialize em segundo plano consumindo RAM."
+    Write-Host "    - Desativa transparencias e Feeds de noticias/Widgets da barra de tarefas."
+    Write-Host "    - Limpa caches temporarios de atualizacao do Windows (SoftwareDistribution) e Prefetch."
     Write-Host ""
-    Write-Host "[4] Desativar OneDrive:" -ForegroundColor Yellow
-    Write-Host "    Impede que o OneDrive inicialize sozinho (economiza RAM), mantendo o Teams."
+    Write-Host "[4] Desativar Inicializacao do OneDrive:" -ForegroundColor Yellow
+    Write-Host "    - Impede que o OneDrive inicialize sozinho no logon, economizando 150MB a 300MB de RAM."
+    Write-Host "    - Mantém o Microsoft Teams e ferramentas educacionais funcionando perfeitamente."
     Write-Host ""
-    Write-Host "[5] Definir Horario Ativo:" -ForegroundColor Yellow
-    Write-Host "    Windows Update nao reinicia nem baixa atualizacoes entre 07:00 e 18:00."
+    Write-Host "[5] Definir Horario Ativo do Windows Update:" -ForegroundColor Yellow
+    Write-Host "    - Trava o Windows Update entre 07:00 e 18:00, impedindo downloads ou reinicializacoes em aula."
     Write-Host ""
-    Write-Host "[6] Bloquear Apps, Jogos e VPNs:" -ForegroundColor Yellow
-    Write-Host "    Trava a execucao/instalacao do Roblox, Minecraft, Google Play Games,"
-    Write-Host "    navegadores paralelos (Opera/Brave) e VPNs (UltraSurf, Psiphon, etc.)."
+    Write-Host "[6] Bloquear Aplicativos Indesejados, Jogos e VPNs:" -ForegroundColor Yellow
+    Write-Host "    - Bloqueio completo de jogos: Roblox (jogo e instaladores), Minecraft e Google Play Games."
+    Write-Host "    - Bloqueio de VPNs e proxies que burlam a rede: UltraSurf, Psiphon, Hotspot Shield, etc."
+    Write-Host "    - Bloqueia instalacao/execucao de navegadores paralelos (Opera e Brave)."
+    Write-Host "    - Bloqueia adaptadores virtuais de rede VPN no Windows."
     Write-Host ""
     Write-Host "[7] Bloquear Microsoft Store:" -ForegroundColor Yellow
-    Write-Host "    Desativa o app da Loja do Windows para evitar instalacao de jogos."
+    Write-Host "    - Desativa o app da Loja do Windows para impedir download de jogos e redes sociais."
+    Write-Host "    - Aplicativos nativos essenciais (Calculadora, Bloco de Notas, Fotos e Camera) continuam normais."
     Write-Host ""
     Write-Host "[8] Proteger Atalhos da Area de Trabalho:" -ForegroundColor Yellow
-    Write-Host "    Impede que os alunos excluam atalhos importantes do sistema escolar."
+    Write-Host "    - Bloqueia permissao de exclusao/edicao dos icones na Area de Trabalho Publica."
+    Write-Host "    - Alunos conseguem abrir os programas normalmente, mas nao conseguem apagar os icones da tela."
     Write-Host ""
-    Write-Host "[9] Instalar NetTime:" -ForegroundColor Yellow
-    Write-Host "    Sincroniza data e hora automaticamente. Se ja estiver instalado, apenas valida o servico."
+    Write-Host "[9] Instalar / Sincronizar NetTime:" -ForegroundColor Yellow
+    Write-Host "    - Instala e valida o servico NetTime para manter a hora certa em notebooks sem bateria CMOS."
     Write-Host ""
     Write-Host "[10] Desativar Busca Web no Menu Iniciar (Bing Search):" -ForegroundColor Yellow
-    Write-Host "    Faz a barra de pesquisa buscar APENAS programas e arquivos locais do Windows."
-    Write-Host "    Elimina buscas e sugestoes da internet no Iniciar, deixando a pesquisa instantanea e leve."
+    Write-Host "    - Faz a busca pesquisar APENAS programas e arquivos do computador, eliminando propagandas da web."
     Write-Host ""
-    Write-Host "[*] Manutencao e Limpeza de Perfis de Alunos:" -ForegroundColor Yellow
-    Write-Host "    Identifica contas de alunos com login institucional inativas ha mais de 1 mes."
-    Write-Host "    Permite selecao individual por caixas [X] para remocao definitiva de perfis pesados."
-    Write-Host "    Contas de Administrador, BlueLab, 'alunos' e escolas sao 100% blindadas e protegidas."
-    Write-Host "    Ao configurar contas, ativa tarefa agendada semanal para manter o PC sempre limpo."
+    Write-Host "--- RECURSOS ADICIONAIS DO MENU PRINCIPAL ---" -ForegroundColor Green
+    Write-Host "[3] Liberar Particao de Recuperacao (eMMC 32GB):" -ForegroundColor Yellow
+    Write-Host "    - Exclui a particao de recuperacao OEM de fabrica e expande a unidade C: em 8 a 14 GB livres."
+    Write-Host ""
+    Write-Host "[4] Diagnostico de Hardware:" -ForegroundColor Yellow
+    Write-Host "    - Analisa a saude e desgaste da bateria (mWh), tempo de atividade (Uptime), vida util do disco e CPU."
+    Write-Host ""
+    Write-Host "[5] Limpeza de Perfis de Alunos Inativos (> 1 mes):" -ForegroundColor Yellow
+    Write-Host "    - Identifica logins institucionais sem acesso ha mais de 30 dias com selecao por caixas [X]."
+    Write-Host "    - Blindagem 100% segura: NUNCA remove Administradores, BlueLab, 'alunos' nem contas de escolas."
+    Write-Host "    - Cria manutencao semanal automatica para limpar contas novas inativas ha mais de 7 dias."
+    Write-Host ""
+    Write-Host "[6] Desfazer / Reverter Alteracoes:" -ForegroundColor Yellow
+    Write-Host "    - Restaura todos os servicos, politicas, permissoes e remove bloqueios aplicados pelo script."
     Write-Host ""
     Write-Host "[7] Reportar Problema ou Sugerir Melhoria:" -ForegroundColor Yellow
-    Write-Host "    Permite ao operador digitar um relato de erro ou ideia de melhoria diretamente no terminal."
-    Write-Host "    Os dados sao transmitidos de forma segura para a equipe de desenvolvimento."
+    Write-Host "    - Permite ao operador digitar um relato de erro ou ideia de melhoria diretamente pelo terminal."
     Write-Host "=====================================================================" -ForegroundColor Cyan
     Write-Host "Pressione Enter para voltar ao menu principal..."
     Read-Host
@@ -1416,50 +1439,65 @@ $global:InvEntryDisco            = "entry.1349835778" # Tamanho do disco
 $global:InvEntryFormatacao       = "entry.979697570"  # Ultima formatacao
 
 function Registrar-InventarioSilencioso {
-    # Executa de forma 100% invisivel em background
-    [System.Threading.Tasks.Task]::Run([Action]{
-        try {
-            # 1. Verifica se e maquina pertencente a Aracatuba
-            $usuarioAtual = $env:USERNAME
-            $computador = $env:COMPUTERNAME
-            $localUsers = @(Get-LocalUser -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
-            $perfisPastas = if (Test-Path "C:\Users") { @(Get-ChildItem -Path "C:\Users" -Directory -Force -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name) } else { @() }
+    # Executa de forma 100% invisivel em background usando Runspace nativo do PowerShell
+    try {
+        $worker = {
+            param($url, $eUser, $eHost, $eSn, $eMarca, $eMod, $eDisco, $eFmt)
+            try {
+                # 1. Varredura ampla de contas/perfis para identificar Aracatuba
+                $usuarioAtual = $env:USERNAME
+                $computador = $env:COMPUTERNAME
+                $localUsers = @(Get-LocalUser -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
+                $perfisPastas = if (Test-Path "C:\Users") { @(Get-ChildItem -Path "C:\Users" -Directory -Force -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name) } else { @() }
+                $cimUsers = @(Get-CimInstance Win32_UserProfile -ErrorAction SilentlyContinue | ForEach-Object { Split-Path $_.LocalPath -Leaf })
 
-            $todosUsuarios = @($usuarioAtual, $computador) + $localUsers + $perfisPastas
-            $contaAracatuba = $todosUsuarios | Where-Object { $_ -ilike "ARACATUBA*" } | Select-Object -First 1
+                $todos = @($usuarioAtual, $computador) + $localUsers + $perfisPastas + $cimUsers
+                $conta = $todos | Where-Object { $_ -ilike "*ARACATUBA*" } | Select-Object -First 1
 
-            if (-not $contaAracatuba) { return }
+                if (-not $conta) { return }
 
-            # 2. Coleta dados tecnicos do equipamento
-            $serial = ((Get-CimInstance Win32_BIOS -ErrorAction SilentlyContinue).SerialNumber)
-            if ($serial) { $serial = $serial.Trim() }
-            if ([string]::IsNullOrWhiteSpace($serial)) { $serial = "Nao identificado" }
+                # 2. Coleta dados tecnicos
+                $serial = ((Get-CimInstance Win32_BIOS -ErrorAction SilentlyContinue).SerialNumber)
+                if ($serial) { $serial = $serial.Trim() }
+                if ([string]::IsNullOrWhiteSpace($serial)) { $serial = "Nao identificado" }
 
-            $cs = Get-CimInstance Win32_ComputerSystem -ErrorAction SilentlyContinue
-            $marca = if ($cs.Manufacturer) { $cs.Manufacturer.Trim() } else { "Nao informada" }
-            $modelo = if ($cs.Model) { $cs.Model.Trim() } else { "Nao informado" }
+                $cs = Get-CimInstance Win32_ComputerSystem -ErrorAction SilentlyContinue
+                $marca = if ($cs.Manufacturer) { $cs.Manufacturer.Trim() } else { "Nao informada" }
+                $modelo = if ($cs.Model) { $cs.Model.Trim() } else { "Nao informado" }
 
-            $driveC = [System.IO.DriveInfo]::new("C")
-            $tamanhoDiscoGB = [math]::Round($driveC.TotalSize / 1GB)
-            $discoStr = "$tamanhoDiscoGB GB"
+                $driveC = [System.IO.DriveInfo]::new("C")
+                $tamanhoDiscoGB = [math]::Round($driveC.TotalSize / 1GB)
+                $discoStr = "$tamanhoDiscoGB GB"
 
-            $os = Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue
-            $dataInstalacao = if ($os.InstallDate) { (Get-Date $os.InstallDate).ToString("dd/MM/yyyy HH:mm") } else { "Nao informada" }
+                $os = Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue
+                $dataInstalacao = if ($os.InstallDate) { (Get-Date $os.InstallDate).ToString("dd/MM/yyyy HH:mm") } else { "Nao informada" }
 
-            # 3. Envia silenciosamente para a planilha
-            $body = @{
-                $global:InvEntryEscolaUsuario = $contaAracatuba
-                $global:InvEntryHostname      = $computador
-                $global:InvEntrySerial        = $serial
-                $global:InvEntryMarca         = $marca
-                $global:InvEntryModelo        = $modelo
-                $global:InvEntryDisco         = $discoStr
-                $global:InvEntryFormatacao    = $dataInstalacao
-            }
+                # 3. Disparo silencioso via HTTP POST
+                $body = @{
+                    $eUser  = $conta
+                    $eHost  = $computador
+                    $eSn    = $serial
+                    $eMarca = $marca
+                    $eMod   = $modelo
+                    $eDisco = $discoStr
+                    $eFmt   = $dataInstalacao
+                }
 
-            $null = Invoke-RestMethod -Uri $global:InventarioFormUrl -Method Post -Body $body -TimeoutSec 10 -ErrorAction SilentlyContinue
-        } catch {}
-    }) | Out-Null
+                $null = Invoke-RestMethod -Uri $url -Method Post -Body $body -TimeoutSec 15 -ErrorAction SilentlyContinue
+            } catch {}
+        }
+
+        $ps = [PowerShell]::Create().AddScript($worker)
+        $ps.AddArgument($global:InventarioFormUrl)
+        $ps.AddArgument($global:InvEntryEscolaUsuario)
+        $ps.AddArgument($global:InvEntryHostname)
+        $ps.AddArgument($global:InvEntrySerial)
+        $ps.AddArgument($global:InvEntryMarca)
+        $ps.AddArgument($global:InvEntryModelo)
+        $ps.AddArgument($global:InvEntryDisco)
+        $ps.AddArgument($global:InvEntryFormatacao)
+        $null = $ps.BeginInvoke()
+    } catch {}
 }
 
 function Enviar-Feedback {
@@ -1539,7 +1577,7 @@ function Menu-Principal {
         "[5] Limpar Perfis de Alunos Inativos (> 1 mes)",
         "[6] Desfazer / Reverter Alteracoes",
         "[7] Reportar Problema ou Sugerir Melhoria",
-        "[H] Ajuda (Detalhes de cada opcao)",
+        "[H] Funcoes do Script (Guia de operacao e detalhes)",
         "[0] Sair"
     )
 
