@@ -1650,7 +1650,10 @@ function Menu-Principal {
                     5 { Desfazer-Alteracoes }
                     6 { Enviar-Feedback }
                     7 { Mostrar-Ajuda }
-                    8 { $loop = $false; Write-Host "Saindo..." }
+                    8 { 
+                        [Console]::CursorVisible = $true
+                        exit
+                    }
                 }
             }
         }
@@ -1669,7 +1672,10 @@ function Menu-Principal {
             "7" { Enviar-Feedback }
             "R" { Enviar-Feedback }
             "H" { Mostrar-Ajuda }
-            "0" { $loop = $false; Write-Host "Saindo..." }
+            "0" { 
+                [Console]::CursorVisible = $true
+                exit
+            }
         }
     }
 }
