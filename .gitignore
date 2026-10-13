@@ -1,0 +1,8 @@
+# Arquivos de backup legados (o Git ja cuida do versionamento)
+*.bak
+*_backup*.ps1
+*backup*.ps1
+
+# Logs e arquivos de teste/temporarios
+*.log
+Feedback_Pendente.txt
