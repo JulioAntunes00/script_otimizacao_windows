@@ -1527,7 +1527,9 @@ function Menu-Principal {
         }
         
         Write-Host "`n Ou pressione o numero/letra correspondente no teclado." -ForegroundColor DarkGray
+        Write-Host "=====================================================================" -ForegroundColor Cyan
         Write-Host " [i] Desenvolvido por: Julio Antunes | github.com/JulioAntunes00" -ForegroundColor DarkCyan
+        Write-Host "=====================================================================" -ForegroundColor Cyan
 
         $key = [Console]::ReadKey($true)
         $char = ""
