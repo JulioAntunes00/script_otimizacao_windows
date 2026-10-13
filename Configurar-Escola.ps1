@@ -53,14 +53,13 @@ function Write-Step {
 # 2. DETECCAO DE HARDWARE
 # =====================================================================
 function Atualizar-MetricasDisco {
-    $sysPart = Get-Partition -DriveLetter ($env:SystemDrive.Trim(':')) -ErrorAction SilentlyContinue
-    if ($sysPart) {
-        $osDisk = Get-Disk -Number $sysPart.DiskNumber -ErrorAction SilentlyContinue
-        $global:diskSizeGB = [math]::Round($osDisk.Size / 1GB, 1)
-        $global:freeSpace = [math]::Round((Get-PSDrive C).Free / 1GB, 1)
-    } else {
+    try {
+        $cDrive = [System.IO.DriveInfo]::new("C")
+        $global:diskSizeGB = [math]::Round($cDrive.TotalSize / 1GB, 1)
+        $global:freeSpace  = [math]::Round($cDrive.AvailableFreeSpace / 1GB, 1)
+    } catch {
         $global:diskSizeGB = 0
-        $global:freeSpace = 0
+        $global:freeSpace  = 0
     }
     $global:is32GB = ($global:diskSizeGB -gt 0 -and $global:diskSizeGB -le 36)
 }
