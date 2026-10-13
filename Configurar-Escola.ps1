@@ -1587,8 +1587,7 @@ function Menu-Principal {
 
         Clear-Host
         Write-Host "=====================================================================" -ForegroundColor Cyan
-        Write-Host "          CONFIGURADOR E OTIMIZADOR ESCOLAR - WIN 10/11              " -ForegroundColor Cyan
-        Write-Host "      v$SCRIPT_VERSAO | Desenvolvido por Julio | GitHub: @JulioAntunes00      " -ForegroundColor DarkCyan
+        Write-Host "          CONFIGURADOR E OTIMIZADOR ESCOLAR - WIN 10/11 (v$SCRIPT_VERSAO)    " -ForegroundColor Cyan
         Write-Host "=====================================================================" -ForegroundColor Cyan
         Write-Host " Sistema: " -NoNewline; Write-Host "$osName | RAM: $ramGB GB" -ForegroundColor Yellow
         Write-Host " Disco do Sistema (C:): " -NoNewline
@@ -1621,7 +1620,8 @@ function Menu-Principal {
             }
         }
         
-        Write-Host "`n Ou pressione o numero/letra correspondente no teclado.`n" -ForegroundColor DarkGray
+        Write-Host "`n Ou pressione o numero/letra correspondente no teclado." -ForegroundColor DarkGray
+        Write-Host " Desenvolvido por Julio Antunes | GitHub: @JulioAntunes00`n" -ForegroundColor Gray
 
         $key = [Console]::ReadKey($true)
         $char = ""

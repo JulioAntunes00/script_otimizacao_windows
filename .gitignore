@@ -6,3 +6,6 @@
 # Logs e arquivos de teste/temporarios
 *.log
 Feedback_Pendente.txt
+
+# Documentacao interna e contexto confidencial
+MEMORIA.md
