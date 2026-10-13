@@ -1493,7 +1493,7 @@ function Menu-Principal {
         Clear-Host
         Write-Host "=====================================================================" -ForegroundColor Cyan
         Write-Host "          CONFIGURADOR E OTIMIZADOR ESCOLAR - WIN 10/11              " -ForegroundColor Cyan
-        Write-Host "         Ambiente: Governo / Azure AD / Laptops Educacionais         " -ForegroundColor Cyan
+        Write-Host "         Criado por: Julio Antunes | @JulioAntunes00                 " -ForegroundColor DarkCyan
         Write-Host "=====================================================================" -ForegroundColor Cyan
         Write-Host " Sistema: " -NoNewline; Write-Host "$osName | RAM: $ramGB GB" -ForegroundColor Yellow
         Write-Host " Disco do Sistema (C:): " -NoNewline
@@ -1526,10 +1526,7 @@ function Menu-Principal {
             }
         }
         
-        Write-Host "`n Ou pressione o numero/letra correspondente no teclado." -ForegroundColor DarkGray
-        Write-Host "=====================================================================" -ForegroundColor Cyan
-        Write-Host " [i] Desenvolvido por: Julio Antunes | github.com/JulioAntunes00" -ForegroundColor DarkCyan
-        Write-Host "=====================================================================" -ForegroundColor Cyan
+        Write-Host "`n Ou pressione o numero/letra correspondente no teclado.`n" -ForegroundColor DarkGray
 
         $key = [Console]::ReadKey($true)
         $char = ""
