@@ -1764,15 +1764,13 @@ function Testar-Teclado {
     $lastEscTime = $null
 
     $row1 = @('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'BKSP')
-    $row2 = @('TAB', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', 'ENTER')
-    $row3 = @('CAPS', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ç', '~')
+    $row2 = @('TAB', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'ENTER')
+    $row3 = @('CAPS', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ç')
     $row4 = @('SHIFT', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', ';', '/')
     $row5 = @('CTRL', 'ALT', 'ESPACO', 'ESQ', 'CIMA', 'BAIXO', 'DIR', 'ESC')
 
-    Clear-Host
-
     :keyLoop while ($true) {
-        try { [Console]::SetCursorPosition(0, 0) } catch { Clear-Host }
+        Clear-Host
         Write-Host "=====================================================================" -ForegroundColor Cyan
         Write-Host "                    TESTADOR RAPIDO DE TECLADO                       " -ForegroundColor Cyan
         Write-Host "=====================================================================" -ForegroundColor Cyan
@@ -1782,7 +1780,7 @@ function Testar-Teclado {
         Write-Host "=====================================================================" -ForegroundColor Cyan
         
         Write-Host " Ultima tecla detectada: " -NoNewline
-        Write-Host "{0,-43}" -f $lastKeyText -ForegroundColor Green
+        Write-Host $lastKeyText -ForegroundColor Green
         $qtd = $tested.Keys.Count
         Write-Host " Total de teclas funcionando: " -NoNewline
         Write-Host "$qtd teclas registradas" -ForegroundColor Yellow
