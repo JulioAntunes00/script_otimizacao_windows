@@ -29,7 +29,7 @@ $ProgressPreference = 'SilentlyContinue'
 # =====================================================================
 # 1. VARIAVEIS E LOGS
 # =====================================================================
-$SCRIPT_VERSAO = "2.3.1"
+$SCRIPT_VERSAO = "2.4.0"
 $LogFile = "$env:TEMP\Otimizacao_Escola.log"
 $dateStr = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 try {
@@ -37,6 +37,17 @@ try {
     Add-Content -Path $LogFile -Value "INICIO DA EXECUCAO: $dateStr" -ErrorAction SilentlyContinue
     Add-Content -Path $LogFile -Value "========================================" -ErrorAction SilentlyContinue
 } catch {}
+
+function Exibir-BannerCompacto {
+    Write-Host "=====================================================================" -ForegroundColor Cyan
+    Write-Host '   ____             __ _        _____             _             ' -ForegroundColor Cyan
+    Write-Host '  / ___|___  _ __  / _(_) __ _ | ____|___  ___ ___ | | __ _ _ __ ' -ForegroundColor Cyan
+    Write-Host ' | |   / _ \| ''_ \| |_| |/ _` ||  _| / __|/ __/ _ \| |/ _` | ''__|' -ForegroundColor Cyan
+    Write-Host ' | |__| (_) | | | |  _| | (_| || |___\__ \ (_| (_) | | (_| | |   ' -ForegroundColor Cyan
+    Write-Host '  \____\___/|_| |_|_| |_|\__, ||_____|___/\___\___/|_|\__,_|_|   ' -ForegroundColor Cyan
+    Write-Host "                         |___/  Configurador Escolar (v$SCRIPT_VERSAO)" -ForegroundColor Cyan
+    Write-Host "=====================================================================" -ForegroundColor Cyan
+}
 
 function Write-Step {
     param([string]$Text, [string]$Status, [string]$Color = "Green")
@@ -509,7 +520,9 @@ function Gerenciar-PerfisInativos {
 # =====================================================================
 
 function Executar-Tarefas {
+    $swExecucao = [System.Diagnostics.Stopwatch]::StartNew()
     Clear-Host
+    Exibir-BannerCompacto
     Write-Host "=====================================================================" -ForegroundColor Cyan
     Write-Host "                 INICIANDO APLICACAO DE MELHORIAS                    " -ForegroundColor Cyan
     Write-Host "=====================================================================" -ForegroundColor Cyan
@@ -1071,12 +1084,42 @@ function Executar-Tarefas {
 
 
 
+    $swExecucao.Stop()
+    $tempoDecorrido = $swExecucao.Elapsed
+    $tempoStr = if ($tempoDecorrido.TotalMinutes -ge 1) {
+        "{0}m {1:d2}s" -f [int]$tempoDecorrido.TotalMinutes, $tempoDecorrido.Seconds
+    } else {
+        "{0} segundos" -f [int]$tempoDecorrido.TotalSeconds
+    }
+
+    try {
+        [Console]::Beep(1000, 150)
+        [Console]::Beep(1400, 220)
+    } catch {}
+
     Write-Host "`n=====================================================================" -ForegroundColor Green
     Write-Host "                    CONCLUIDO COM SUCESSO!                           " -ForegroundColor Green
     Write-Host "=====================================================================" -ForegroundColor Green
-    Write-Host "Log salvo em: $LogFile" -ForegroundColor DarkGray
-    Write-Host "Pressione Enter para voltar ao menu principal..."
-    Read-Host
+    Write-Host " Tempo total de execucao: $tempoStr" -ForegroundColor Yellow
+    Write-Host " Log salvo em: $LogFile`n" -ForegroundColor DarkGray
+    Write-Host " Opcoes de finalizacao:" -ForegroundColor Cyan
+    Write-Host "  [Enter] Voltar ao Menu Principal" -ForegroundColor White
+    Write-Host "  [R]     Reiniciar notebook agora (testar tela de login 'alunos')" -ForegroundColor White
+    Write-Host "  [D]     Desligar notebook agora`n" -ForegroundColor White
+
+    $fimKey = [Console]::ReadKey($true)
+    $fimChar = if ([int]$fimKey.KeyChar -ne 0) { $fimKey.KeyChar.ToString().ToUpper() } else { "" }
+    if ($fimChar -eq "R") {
+        Write-Host " Reiniciando o computador em 3 segundos..." -ForegroundColor Yellow
+        Start-Sleep -Seconds 3
+        Restart-Computer -Force
+        exit
+    } elseif ($fimChar -eq "D") {
+        Write-Host " Desligando o computador em 3 segundos..." -ForegroundColor Yellow
+        Start-Sleep -Seconds 3
+        Stop-Computer -Force
+        exit
+    }
 }
 
 # =====================================================================
@@ -1458,6 +1501,10 @@ function Mostrar-Ajuda {
     Write-Host ""
     Write-Host "[7] Reportar Problema ou Sugerir Melhoria:" -ForegroundColor Yellow
     Write-Host "    - Permite ao operador digitar um relato de erro ou ideia de melhoria diretamente pelo terminal."
+    Write-Host ""
+    Write-Host "[8] Ferramentas de Teste e Suporte (Teclado e Audio):" -ForegroundColor Yellow
+    Write-Host "    - Testador Rapido de Teclado: Detecta se teclas individuais estao funcionando ou danificadas."
+    Write-Host "    - Teste de Audio e Alto-falantes: Toca frequencias e escala sonora estereo para checar as caixas de som."
     Write-Host "=====================================================================" -ForegroundColor Cyan
     Write-Host "Pressione Enter para voltar ao menu principal..."
     Read-Host
@@ -1705,6 +1752,309 @@ Sistema: $infoSistema
     Read-Host
 }
 
+# =====================================================================
+# 5. FERRAMENTAS DE SUPORTE E TESTE DE HARDWARE
+# =====================================================================
+
+function Testar-Teclado {
+    Clear-Host
+    try { [Console]::CursorVisible = $false } catch {}
+    $tested = @{}
+    $lastKeyText = "Nenhuma tecla pressionada ainda"
+    $lastEscTime = $null
+
+    $row1 = @('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'BKSP')
+    $row2 = @('TAB', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', 'ENTER')
+    $row3 = @('CAPS', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ç', '~')
+    $row4 = @('SHIFT', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', ';', '/')
+    $row5 = @('CTRL', 'ALT', 'ESPACO', 'ESQ', 'CIMA', 'BAIXO', 'DIR', 'ESC')
+
+    Clear-Host
+
+    :keyLoop while ($true) {
+        try { [Console]::SetCursorPosition(0, 0) } catch { Clear-Host }
+        Write-Host "=====================================================================" -ForegroundColor Cyan
+        Write-Host "                    TESTADOR RAPIDO DE TECLADO                       " -ForegroundColor Cyan
+        Write-Host "=====================================================================" -ForegroundColor Cyan
+        Write-Host " Pressione as teclas do notebook para testar se estao respondendo." -ForegroundColor Yellow
+        Write-Host " As teclas detectadas ficarao destacadas em VERDE." -ForegroundColor Yellow
+        Write-Host " Para sair, pressione [ESC] duas vezes seguidas ou aperte [F12]." -ForegroundColor DarkGray
+        Write-Host "=====================================================================" -ForegroundColor Cyan
+        
+        Write-Host " Ultima tecla detectada: " -NoNewline
+        Write-Host "{0,-43}" -f $lastKeyText -ForegroundColor Green
+        $qtd = $tested.Keys.Count
+        Write-Host " Total de teclas funcionando: " -NoNewline
+        Write-Host "$qtd teclas registradas" -ForegroundColor Yellow
+        Write-Host "---------------------------------------------------------------------" -ForegroundColor DarkGray
+
+        # Linha 1: 1 a = + BKSP
+        Write-Host " " -NoNewline
+        foreach ($k in $row1) {
+            if ($tested.ContainsKey($k)) {
+                Write-Host "[$k] " -NoNewline -ForegroundColor Green
+            } else {
+                Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+            }
+        }
+        Write-Host "`n"
+
+        # Linha 2: TAB, QWERTY, ENTER
+        Write-Host " " -NoNewline
+        foreach ($k in $row2) {
+            if ($tested.ContainsKey($k)) {
+                Write-Host "[$k] " -NoNewline -ForegroundColor Green
+            } else {
+                Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+            }
+        }
+        Write-Host "`n"
+
+        # Linha 3: CAPS, ASDFGHJKL, Ç, ~
+        Write-Host " " -NoNewline
+        foreach ($k in $row3) {
+            if ($tested.ContainsKey($k)) {
+                Write-Host "[$k] " -NoNewline -ForegroundColor Green
+            } else {
+                Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+            }
+        }
+        Write-Host "`n"
+
+        # Linha 4: SHIFT, ZXCVBNM, ., /
+        Write-Host " " -NoNewline
+        foreach ($k in $row4) {
+            if ($tested.ContainsKey($k)) {
+                Write-Host "[$k] " -NoNewline -ForegroundColor Green
+            } else {
+                Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+            }
+        }
+        Write-Host "`n"
+
+        # Linha 5: CTRL, ESPACO, SETAS, ESC
+        Write-Host " " -NoNewline
+        foreach ($k in $row5) {
+            if ($tested.ContainsKey($k)) {
+                Write-Host "[$k] " -NoNewline -ForegroundColor Green
+            } else {
+                Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+            }
+        }
+        Write-Host "`n"
+        Write-Host "=====================================================================" -ForegroundColor Cyan
+        if ($lastEscTime -and ((Get-Date) - $lastEscTime).TotalSeconds -le 2.5) {
+            Write-Host " >> ATENCAO: Pressione [ESC] novamente agora para sair! <<          " -ForegroundColor Magenta
+        } else {
+            Write-Host " Digite qualquer tecla... (ESC 2x para sair, ou F12)                " -ForegroundColor DarkGray
+        }
+
+        $keyInfo = $null
+        try {
+            $keyInfo = [Console]::ReadKey($true)
+        } catch {
+            break keyLoop
+        }
+
+        if (-not $keyInfo) { break keyLoop }
+
+        if ($keyInfo.Key -eq 'F12') {
+            break keyLoop
+        }
+
+        if ($keyInfo.Key -eq 'Escape') {
+            $now = Get-Date
+            if ($lastEscTime -and ($now - $lastEscTime).TotalSeconds -le 2.5) {
+                break keyLoop
+            }
+            $lastEscTime = $now
+        }
+
+        $mapped = $null
+
+        # Tratamento de tecla
+        switch ($keyInfo.Key) {
+            'Escape' { $mapped = 'ESC' }
+            'Spacebar' { $mapped = 'ESPACO' }
+            'Enter' { $mapped = 'ENTER' }
+            'Backspace' { $mapped = 'BKSP' }
+            'Tab' { $mapped = 'TAB' }
+            'UpArrow' { $mapped = 'CIMA' }
+            'DownArrow' { $mapped = 'BAIXO' }
+            'LeftArrow' { $mapped = 'ESQ' }
+            'RightArrow' { $mapped = 'DIR' }
+            'OemMinus' { $mapped = '-' }
+            'OemPlus' { $mapped = '=' }
+            'OemComma' { $mapped = ',' }
+            'OemPeriod' { $mapped = '.' }
+            'Oem1' { $mapped = 'Ç' }
+            'Oem2' { $mapped = ';' }
+            'Oem4' { $mapped = '[' }
+            'Oem6' { $mapped = ']' }
+            'Oem7' { $mapped = '~' }
+            'OemQuestion' { $mapped = '/' }
+            'Capital' { $mapped = 'CAPS' }
+            default {
+                if ($keyInfo.Key.ToString() -match '^D(\d)$') {
+                    $mapped = $Matches[1]
+                } elseif ($keyInfo.Key.ToString() -match '^NumPad(\d)$') {
+                    $mapped = $Matches[1]
+                } else {
+                    $ch = $keyInfo.KeyChar.ToString().ToUpper()
+                    if ($ch -match '^[A-Z0-9Ç]$') {
+                        $mapped = $ch
+                    } else {
+                        $kName = $keyInfo.Key.ToString().ToUpper()
+                        if ($kName.Length -eq 1) {
+                            $mapped = $kName
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($keyInfo.Modifiers -band [ConsoleModifiers]::Shift) { $tested['SHIFT'] = $true }
+        if ($keyInfo.Modifiers -band [ConsoleModifiers]::Control) { $tested['CTRL'] = $true }
+        if ($keyInfo.Modifiers -band [ConsoleModifiers]::Alt) { $tested['ALT'] = $true }
+
+        if ($mapped) {
+            $tested[$mapped] = $true
+            $lastKeyText = "[$mapped] (Key: $($keyInfo.Key))"
+        } else {
+            $rawKey = $keyInfo.Key.ToString()
+            $tested[$rawKey] = $true
+            $lastKeyText = "[$rawKey]"
+        }
+    }
+    try { [Console]::CursorVisible = $true } catch {}
+}
+
+function Testar-AudioAltoFalantes {
+    Clear-Host
+    Write-Host "=====================================================================" -ForegroundColor Cyan
+    Write-Host "                  TESTE RAPIDO DE AUDIO E ALTO-FALANTES             " -ForegroundColor Cyan
+    Write-Host "=====================================================================" -ForegroundColor Cyan
+    Write-Host "`n Executando teste de canais sonoros, drivers e alto-falantes internos...`n" -ForegroundColor Yellow
+
+    # 1. Toca acorde via Beep do console
+    Write-Host " [1/2] Emitindo escala harmônica de frequencias (Beep)... " -NoNewline -ForegroundColor White
+    try {
+        $notas = @(
+            @{ Freq = 523; Dur = 130 }, # Do (C5)
+            @{ Freq = 659; Dur = 130 }, # Mi (E5)
+            @{ Freq = 784; Dur = 130 }, # Sol (G5)
+            @{ Freq = 1046; Dur = 260 } # Do agudo (C6)
+        )
+        foreach ($n in $notas) {
+            [Console]::Beep($n.Freq, $n.Dur)
+        }
+        Write-Host "[OK]" -ForegroundColor Green
+    } catch {
+        Write-Host "[INDISPONIVEL]" -ForegroundColor DarkGray
+    }
+
+    Start-Sleep -Milliseconds 250
+
+    # 2. Toca audio estereo do Windows pelo SoundPlayer
+    Write-Host " [2/2] Reproduzindo audio de teste estereo nos alto-falantes (WAV)... " -NoNewline -ForegroundColor White
+    $wavPath = "C:\Windows\Media\chimes.wav"
+    if (-not (Test-Path $wavPath)) { $wavPath = "C:\Windows\Media\tada.wav" }
+    if (Test-Path $wavPath) {
+        try {
+            $player = New-Object System.Media.SoundPlayer($wavPath)
+            $player.PlaySync()
+            Write-Host "[OK]" -ForegroundColor Green
+        } catch {
+            Write-Host "[AVISO: $($_.Exception.Message)]" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "[ARQUIVO PADRAO NAO LOCALIZADO]" -ForegroundColor DarkGray
+    }
+
+    Write-Host "`n Status dos dispositivos de som detectados no Windows:" -ForegroundColor Cyan
+    try {
+        $audioDevices = Get-CimInstance Win32_SoundDevice -ErrorAction SilentlyContinue
+        if ($audioDevices) {
+            foreach ($dev in $audioDevices) {
+                $statusColor = if ($dev.Status -eq "OK") { "Green" } else { "Yellow" }
+                Write-Host " -> Dispositivo: $($dev.Name)" -ForegroundColor $statusColor
+                Write-Host "    Fabricante:  $($dev.Manufacturer) | Status: [$($dev.Status)]" -ForegroundColor DarkGray
+            }
+        } else {
+            Write-Host " -> Nenhum dispositivo de som retornado pelo sistema." -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host " -> Nao foi possivel consultar dispositivos de som." -ForegroundColor DarkGray
+    }
+
+    Write-Host "`n=====================================================================" -ForegroundColor Cyan
+    Write-Host " Se voce ouviu os sons claramente, os alto-falantes e o driver estao OK!" -ForegroundColor Green
+    Write-Host " Pressione qualquer tecla para voltar ao menu de ferramentas..." -ForegroundColor DarkGray
+    try { [Console]::ReadKey($true) | Out-Null } catch {}
+}
+
+function Menu-Ferramentas {
+    $loop = $true
+    $selectedIndex = 0
+    $toolItems = @(
+        "[1] Testador Rapido de Teclado (Detecta teclas falhando ou presas)",
+        "[2] Teste Rapido de Audio e Alto-falantes (Escala sonora e canais)",
+        "[V] Voltar ao Menu Principal"
+    )
+
+    while ($loop) {
+        Clear-Host
+        Exibir-BannerCompacto
+        Write-Host "=====================================================================" -ForegroundColor Cyan
+        Write-Host "                    FERRAMENTAS DE SUPORTE E TESTE                   " -ForegroundColor Cyan
+        Write-Host "=====================================================================" -ForegroundColor Cyan
+        Write-Host " Utilitarios para teste rapido de perifericos em bancada:`n" -ForegroundColor Yellow
+
+        for ($i = 0; $i -lt $toolItems.Count; $i++) {
+            $prefix = if ($i -eq $selectedIndex) { " -> " } else { "    " }
+            $text = $toolItems[$i]
+            if ($i -eq $selectedIndex) {
+                Write-Host "${prefix}${text}" -ForegroundColor Green
+            } else {
+                Write-Host "${prefix}${text}" -ForegroundColor White
+            }
+        }
+
+        Write-Host "`n Use as SETAS (Cima/Baixo) e ENTER, ou o numero correspondente." -ForegroundColor DarkGray
+        Write-Host " Pressione [V] ou [ESC] para retornar ao menu principal.`n" -ForegroundColor DarkGray
+
+        $key = [Console]::ReadKey($true)
+        $char = ""
+        if ([int]$key.KeyChar -ne 0) { $char = $key.KeyChar.ToString().ToUpper() }
+
+        switch ($key.Key) {
+            'UpArrow' { 
+                $selectedIndex--
+                if ($selectedIndex -lt 0) { $selectedIndex = $toolItems.Count - 1 }
+            }
+            'DownArrow' { 
+                $selectedIndex++
+                if ($selectedIndex -ge $toolItems.Count) { $selectedIndex = 0 }
+            }
+            'Escape' { return }
+            'Enter' {
+                switch ($selectedIndex) {
+                    0 { Testar-Teclado }
+                    1 { Testar-AudioAltoFalantes }
+                    2 { return }
+                }
+            }
+        }
+
+        switch ($char) {
+            "1" { Testar-Teclado }
+            "2" { Testar-AudioAltoFalantes }
+            "V" { return }
+            "0" { return }
+        }
+    }
+}
+
 function Menu-Principal {
     $loop = $true
     $selectedIndex = 0
@@ -1717,6 +2067,7 @@ function Menu-Principal {
         "[5] Limpar Perfis de Alunos Inativos (> 1 mes)",
         "[6] Desfazer / Reverter Alteracoes",
         "[7] Reportar Problema ou Sugerir Melhoria",
+        "[8] Ferramentas de Suporte (Testar Teclado e Audio)",
         "[H] Funcoes do Script (Guia de operacao e detalhes)",
         "[0] Sair"
     )
@@ -1726,9 +2077,7 @@ function Menu-Principal {
         $liberado = [math]::Round($global:freeSpace - $global:espacoInicial, 1)
 
         Clear-Host
-        Write-Host "=====================================================================" -ForegroundColor Cyan
-        Write-Host "          CONFIGURADOR E OTIMIZADOR ESCOLAR - WIN 10/11 (v$SCRIPT_VERSAO)    " -ForegroundColor Cyan
-        Write-Host "=====================================================================" -ForegroundColor Cyan
+        Exibir-BannerCompacto
         Write-Host " Sistema: " -NoNewline; Write-Host "$osName | RAM: $ramGB GB" -ForegroundColor Yellow
         Write-Host " Disco do Sistema (C:): " -NoNewline
         if ($liberado -gt 0.05) {
@@ -1789,8 +2138,9 @@ function Menu-Principal {
                     4 { Gerenciar-PerfisInativos }
                     5 { Desfazer-Alteracoes }
                     6 { Enviar-Feedback }
-                    7 { Mostrar-Ajuda }
-                    8 { 
+                    7 { Menu-Ferramentas }
+                    8 { Mostrar-Ajuda }
+                    9 { 
                         [Console]::CursorVisible = $true
                         exit
                     }
@@ -1810,6 +2160,8 @@ function Menu-Principal {
             "5" { Gerenciar-PerfisInativos }
             "6" { Desfazer-Alteracoes }
             "7" { Enviar-Feedback }
+            "8" { Menu-Ferramentas }
+            "F" { Menu-Ferramentas }
             "R" { Enviar-Feedback }
             "H" { Mostrar-Ajuda }
             "0" { 

@@ -14,6 +14,7 @@ Ao abrir o script, você verá o **Menu Principal**:
 * **[5] Limpar Perfis de Alunos Inativos:** Verifica perfis de alunos com login institucional inativos há mais de 1 mês (30 dias) e abre tela interativa com caixas `[X]` para exclusão seletiva, liberando gigabytes de cache sem tocar em contas de administradores ou do sistema.
 * **[6] Desfazer / Reverter Alterações:** Reabilita os serviços e remove os bloqueios aplicados caso precise voltar atrás.
 * **[7] Reportar Problema ou Sugerir Melhoria:** Permite enviar feedbacks, relatos de erros e sugestões diretamente do terminal para a equipe de suporte e desenvolvimento.
+* **[8] Ferramentas de Suporte (Testar Teclado e Áudio):** Utilitários rápidos para diagnosticar teclas danificadas/presas e testar alto-falantes e drivers de som.
 * **[H] Funções do Script:** Guia completo e detalhado de todas as 10 otimizações e recursos do menu diretamente na tela.
 * **[0] Sair:** Fecha o script e encerra a janela.
 
@@ -89,6 +90,11 @@ Ao abrir o script, você verá o **Menu Principal**:
 ### [7] Reportar Problema ou Sugerir Melhoria
 - Permite ao técnico relatar erros de execução ou enviar ideias de melhoria diretamente do terminal.
 - Coleta opcionalmente Nome e Cidade/Escola e anexa diagnóstico de hardware (Windows, RAM, espaço em disco) de forma segura e transparente.
+
+### [8] Ferramentas de Suporte e Teste de Hardware
+- **Testador Rápido de Teclado:** Exibe uma matriz visual interativa de teclas do notebook. À medida que o técnico pressiona as teclas, elas acendem instantaneamente em verde, permitindo identificar com precisão teclas estragadas, sujas ou presas antes de liberar o equipamento.
+- **Teste Rápido de Áudio e Alto-falantes:** Executa uma escala de frequências harmônicas via Beep e reproduz áudio estéreo do Windows para testar se os alto-falantes internos e drivers de som estão funcionando sem chiados.
+
 
 ---
 
