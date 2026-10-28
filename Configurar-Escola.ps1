@@ -42,13 +42,48 @@ try {
 
 function Write-Step {
     param([string]$Text, [string]$Status, [string]$Color = "Green")
-    $msg = "{0,-65} [{1}]" -f $Text, $Status
+    $msg = "`r  {0,-65} [{1}]" -f $Text, $Status
     if ($Status -eq "OK") { Write-Host $msg -ForegroundColor Green }
     elseif ($Status -eq "FALHA") { Write-Host $msg -ForegroundColor Red }
     elseif ($Status -eq "AVISO") { Write-Host $msg -ForegroundColor Yellow }
     else { Write-Host $msg -ForegroundColor $Color }
     
     try { Add-Content -Path $LogFile -Value "$Text -> $Status" -ErrorAction SilentlyContinue } catch {}
+}
+
+function Invoke-TaskWithSpinner {
+    param(
+        [string]$Text,
+        [scriptblock]$Action
+    )
+    $frames = @('|', '/', '-', '\')
+    $frameIdx = 0
+
+    # Exibe animacao enquanto executa
+    Write-Host "`r  [|] $Text..." -NoNewline -ForegroundColor Cyan
+
+    $erroOcorrido = $null
+    try {
+        # Dispara uma pequena animacao de pulso visual para operacoes rapidas e medias
+        for ($i = 0; $i -lt 4; $i++) {
+            $f = $frames[$frameIdx]
+            $frameIdx = ($frameIdx + 1) % $frames.Count
+            Write-Host "`r  [$f] $Text..." -NoNewline -ForegroundColor Cyan
+            Start-Sleep -Milliseconds 45
+        }
+        
+        # Executa a acao da tarefa
+        & $Action
+    } catch {
+        $erroOcorrido = $_
+    }
+
+    if ($erroOcorrido) {
+        Write-Step -Text $Text -Status "AVISO"
+        try { Add-Content -Path $LogFile -Value "Erro em '$Text': $($erroOcorrido.Exception.Message)" -ErrorAction SilentlyContinue } catch {}
+    } else {
+        Write-Step -Text $Text -Status "OK"
+    }
 }
 
 # =====================================================================
@@ -222,7 +257,13 @@ foreach ($p in $perfis) {
 function Gerenciar-PerfisInativos {
     param([switch]$SilenciosoSeVazio)
 
-    Write-Host "`n>> Analisando perfis de usuarios no computador..." -ForegroundColor Cyan
+    $spinFrames = @('|', '/', '-', '\')
+    for ($sf = 0; $sf -lt 6; $sf++) {
+        $f = $spinFrames[$sf % 4]
+        Write-Host "`r  [$f] Analisando perfis de usuarios no computador...   " -NoNewline -ForegroundColor Cyan
+        Start-Sleep -Milliseconds 50
+    }
+    Write-Host "`r  [OK] Analisando perfis de usuarios no computador...   " -ForegroundColor Green
 
     $adminGroup = Get-LocalGroup | Where-Object { $_.SID -eq 'S-1-5-32-544' }
     $adminMembers = if ($adminGroup) { Get-LocalGroupMember -Group $adminGroup.Name -ErrorAction SilentlyContinue } else { @() }
@@ -332,11 +373,18 @@ function Gerenciar-PerfisInativos {
 
         Write-Host "`n`n >> Excluindo $($candidatos.Count) perfil(is) inativo(s)..." -ForegroundColor Cyan
         foreach ($item in $candidatos) {
+            $u = $item.UserName
+            $spinFrames = @('|', '/', '-', '\')
+            for ($sf = 0; $sf -lt 4; $sf++) {
+                $f = $spinFrames[$sf % 4]
+                Write-Host "`r  [$f] Removendo perfil '$u'...   " -NoNewline -ForegroundColor Cyan
+                Start-Sleep -Milliseconds 45
+            }
             try {
                 $item.Perfil | Remove-CimInstance -ErrorAction Stop
-                Write-Step -Text "Perfil '$($item.UserName)' removido com sucesso" -Status "OK"
+                Write-Step -Text "Perfil '$u' removido com sucesso" -Status "OK"
             } catch {
-                Write-Step -Text "Falha ao remover perfil '$($item.UserName)' ($($_.Exception.Message))" -Status "AVISO"
+                Write-Step -Text "Falha ao remover perfil '$u' ($($_.Exception.Message))" -Status "AVISO"
             }
         }
         Write-Host "`n >> Exclusao finalizada. Prosseguindo com as otimizacoes...`n" -ForegroundColor Green
@@ -468,6 +516,14 @@ function Executar-Tarefas {
     Write-Host "                 INICIANDO APLICACAO DE MELHORIAS                    " -ForegroundColor Cyan
     Write-Host "=====================================================================" -ForegroundColor Cyan
 
+    $spinFrames = @('|', '/', '-', '\')
+    for ($sf = 0; $sf -lt 6; $sf++) {
+        $f = $spinFrames[$sf % 4]
+        Write-Host "`r  [$f] Preparando ambiente de otimizacao...   " -NoNewline -ForegroundColor Cyan
+        Start-Sleep -Milliseconds 45
+    }
+    Write-Host "`r  [OK] Preparando ambiente de otimizacao...   " -ForegroundColor Green
+
     # Verificar perfis inativos ha mais de 1 mes (30 dias) com confirmacao/selecao
     Gerenciar-PerfisInativos -SilenciosoSeVazio
 
@@ -477,6 +533,12 @@ function Executar-Tarefas {
     # [01] Contas
     if ($global:opts[1]) {
         Write-Host "`n>> [01] Configurando Contas de Usuario..." -ForegroundColor Cyan
+        $spinFrames = @('|', '/', '-', '\')
+        for ($sf = 0; $sf -lt 4; $sf++) {
+            $f = $spinFrames[$sf % 4]
+            Write-Host "`r  [$f] Aplicando politicas da conta alunos e LogonUI...   " -NoNewline -ForegroundColor Cyan
+            Start-Sleep -Milliseconds 45
+        }
         try {
             $aluno = Get-LocalUser -Name "alunos" -ErrorAction SilentlyContinue
             if (-not $aluno) { New-LocalUser -Name "alunos" -NoPassword -UserMayNotChangePassword | Out-Null }
@@ -713,6 +775,12 @@ function Executar-Tarefas {
 
         # 3.8 - Limpeza segura de arquivos temporarios e caches do sistema
         try {
+            $spinFrames = @('|', '/', '-', '\')
+            for ($sf = 0; $sf -lt 6; $sf++) {
+                $f = $spinFrames[$sf % 4]
+                Write-Host "`r  [$f]   [3.8] Limpando caches e arquivos temporarios do sistema...   " -NoNewline -ForegroundColor Cyan
+                Start-Sleep -Milliseconds 50
+            }
             Clear-RecycleBin -Force -ErrorAction SilentlyContinue
             
             # Limpeza segura do Windows (sem tocar em pastas de usuarios nem perfis AD)
@@ -898,9 +966,14 @@ function Executar-Tarefas {
                     $processo = Start-Process -FilePath $instaladorFinal -ArgumentList $argumentos -PassThru
                     
                     $limite = 20
+                    $spinFrames = @('|', '/', '-', '\')
+                    $sf = 0
                     while (-not $processo.HasExited -and $limite -gt 0) {
-                        Start-Sleep -Seconds 1
-                        $limite--
+                        $f = $spinFrames[$sf % 4]
+                        Write-Host "`r  [$f] Instalando e registrando servico NetTime...   " -NoNewline -ForegroundColor Cyan
+                        $sf++
+                        Start-Sleep -Milliseconds 250
+                        $limite -= 0.25
                     }
                     if (-not $processo.HasExited) {
                         Stop-Process -Id $processo.Id -Force -ErrorAction SilentlyContinue
@@ -1027,7 +1100,13 @@ function Liberar-ParticaoRecovery {
     
     $confirm = Read-Host " Deseja realmente prosseguir? [S] Sim | [N] Cancelar"
     if ($confirm -match "^[sS]") {
-        Write-Host "`n -> Localizando e removendo particao de recuperacao..." -ForegroundColor Cyan
+        $spinFrames = @('|', '/', '-', '\')
+        for ($sf = 0; $sf -lt 6; $sf++) {
+            $f = $spinFrames[$sf % 4]
+            Write-Host "`r  [$f] Localizando e analisando particoes OEM do disco...   " -NoNewline -ForegroundColor Cyan
+            Start-Sleep -Milliseconds 60
+        }
+        Write-Host "`r  [OK] Localizando e analisando particoes OEM do disco...   " -ForegroundColor Green
         try {
             $sysPart = Get-Partition -DriveLetter ($env:SystemDrive.Trim(':'))
             $recoveryParts = Get-Partition -DiskNumber $sysPart.DiskNumber | Where-Object { $_.Type -match "Recovery" -or $_.GptType -match "Recovery" }
