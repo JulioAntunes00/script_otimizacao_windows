@@ -1757,11 +1757,17 @@ Sistema: $infoSistema
 # =====================================================================
 
 function Testar-Teclado {
+    try {
+        $winKeySig = '[DllImport("user32.dll")] public static extern short GetAsyncKeyState(int vKey);'
+        Add-Type -MemberDefinition $winKeySig -Name "WinKeyCheck" -Namespace "Win32" -ErrorAction SilentlyContinue
+    } catch {}
+
     Clear-Host
     try { [Console]::CursorVisible = $false } catch {}
     $tested = @{}
     $lastKeyText = "Nenhuma tecla pressionada ainda"
     $lastEscTime = $null
+    $lastCapsState = [Console]::CapsLock
 
     $row1 = @('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'BKSP')
     $row2 = @('TAB', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'ENTER')
@@ -1769,84 +1775,171 @@ function Testar-Teclado {
     $row4 = @('SHIFT', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', ';', '/')
     $row5 = @('CTRL', 'ALT', 'ESPACO', 'ESQ', 'CIMA', 'BAIXO', 'DIR', 'ESC')
 
+    $needRedraw = $true
+
     :keyLoop while ($true) {
-        Clear-Host
-        Write-Host "=====================================================================" -ForegroundColor Cyan
-        Write-Host "                    TESTADOR RAPIDO DE TECLADO                       " -ForegroundColor Cyan
-        Write-Host "=====================================================================" -ForegroundColor Cyan
-        Write-Host " Pressione as teclas do notebook para testar se estao respondendo." -ForegroundColor Yellow
-        Write-Host " As teclas detectadas ficarao destacadas em VERDE." -ForegroundColor Yellow
-        Write-Host " Para sair, pressione [ESC] duas vezes seguidas ou aperte [F12]." -ForegroundColor DarkGray
-        Write-Host "=====================================================================" -ForegroundColor Cyan
-        
-        Write-Host " Ultima tecla detectada: " -NoNewline
-        Write-Host $lastKeyText -ForegroundColor Green
-        $qtd = $tested.Keys.Count
-        Write-Host " Total de teclas funcionando: " -NoNewline
-        Write-Host "$qtd teclas registradas" -ForegroundColor Yellow
-        Write-Host "---------------------------------------------------------------------" -ForegroundColor DarkGray
+        if ($needRedraw) {
+            Clear-Host
+            Write-Host "=====================================================================" -ForegroundColor Cyan
+            Write-Host "                    TESTADOR RAPIDO DE TECLADO                       " -ForegroundColor Cyan
+            Write-Host "=====================================================================" -ForegroundColor Cyan
+            Write-Host " Pressione as teclas do notebook para testar se estao respondendo." -ForegroundColor Yellow
+            Write-Host " As teclas detectadas ficarao destacadas em VERDE." -ForegroundColor Yellow
+            Write-Host " Para sair, pressione [ESC] duas vezes seguidas ou aperte [F12]." -ForegroundColor DarkGray
+            Write-Host "=====================================================================" -ForegroundColor Cyan
+            
+            Write-Host " Ultima tecla detectada: " -NoNewline
+            Write-Host $lastKeyText -ForegroundColor Green
+            $qtd = $tested.Keys.Count
+            Write-Host " Total de teclas funcionando: " -NoNewline
+            Write-Host "$qtd teclas registradas" -ForegroundColor Yellow
+            Write-Host "---------------------------------------------------------------------" -ForegroundColor DarkGray
 
-        # Linha 1: 1 a = + BKSP
-        Write-Host " " -NoNewline
-        foreach ($k in $row1) {
-            if ($tested.ContainsKey($k)) {
-                Write-Host "[$k] " -NoNewline -ForegroundColor Green
-            } else {
-                Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+            # Linha 1: 1 a = + BKSP
+            Write-Host " " -NoNewline
+            foreach ($k in $row1) {
+                if ($tested.ContainsKey($k)) {
+                    Write-Host "[$k] " -NoNewline -ForegroundColor Green
+                } else {
+                    Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+                }
             }
-        }
-        Write-Host "`n"
+            Write-Host "`n"
 
-        # Linha 2: TAB, QWERTY, ENTER
-        Write-Host " " -NoNewline
-        foreach ($k in $row2) {
-            if ($tested.ContainsKey($k)) {
-                Write-Host "[$k] " -NoNewline -ForegroundColor Green
-            } else {
-                Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+            # Linha 2: TAB, QWERTY, ENTER
+            Write-Host " " -NoNewline
+            foreach ($k in $row2) {
+                if ($tested.ContainsKey($k)) {
+                    Write-Host "[$k] " -NoNewline -ForegroundColor Green
+                } else {
+                    Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+                }
             }
-        }
-        Write-Host "`n"
+            Write-Host "`n"
 
-        # Linha 3: CAPS, ASDFGHJKL, Ç, ~
-        Write-Host " " -NoNewline
-        foreach ($k in $row3) {
-            if ($tested.ContainsKey($k)) {
-                Write-Host "[$k] " -NoNewline -ForegroundColor Green
-            } else {
-                Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+            # Linha 3: CAPS, ASDFGHJKL, Ç
+            Write-Host " " -NoNewline
+            foreach ($k in $row3) {
+                if ($tested.ContainsKey($k)) {
+                    Write-Host "[$k] " -NoNewline -ForegroundColor Green
+                } else {
+                    Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+                }
             }
-        }
-        Write-Host "`n"
+            Write-Host "`n"
 
-        # Linha 4: SHIFT, ZXCVBNM, ., /
-        Write-Host " " -NoNewline
-        foreach ($k in $row4) {
-            if ($tested.ContainsKey($k)) {
-                Write-Host "[$k] " -NoNewline -ForegroundColor Green
-            } else {
-                Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+            # Linha 4: SHIFT, ZXCVBNM, ., /
+            Write-Host " " -NoNewline
+            foreach ($k in $row4) {
+                if ($tested.ContainsKey($k)) {
+                    Write-Host "[$k] " -NoNewline -ForegroundColor Green
+                } else {
+                    Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+                }
             }
-        }
-        Write-Host "`n"
+            Write-Host "`n"
 
-        # Linha 5: CTRL, ESPACO, SETAS, ESC
-        Write-Host " " -NoNewline
-        foreach ($k in $row5) {
-            if ($tested.ContainsKey($k)) {
-                Write-Host "[$k] " -NoNewline -ForegroundColor Green
-            } else {
-                Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+            # Linha 5: CTRL, ALT, ESPACO, SETAS, ESC
+            Write-Host " " -NoNewline
+            foreach ($k in $row5) {
+                if ($tested.ContainsKey($k)) {
+                    Write-Host "[$k] " -NoNewline -ForegroundColor Green
+                } else {
+                    Write-Host "[$k] " -NoNewline -ForegroundColor DarkGray
+                }
             }
-        }
-        Write-Host "`n"
-        Write-Host "=====================================================================" -ForegroundColor Cyan
-        if ($lastEscTime -and ((Get-Date) - $lastEscTime).TotalSeconds -le 2.5) {
-            Write-Host " >> ATENCAO: Pressione [ESC] novamente agora para sair! <<          " -ForegroundColor Magenta
-        } else {
-            Write-Host " Digite qualquer tecla... (ESC 2x para sair, ou F12)                " -ForegroundColor DarkGray
+            Write-Host "`n"
+            Write-Host "=====================================================================" -ForegroundColor Cyan
+            if ($lastEscTime -and ((Get-Date) - $lastEscTime).TotalSeconds -le 2.5) {
+                Write-Host " >> ATENCAO: Pressione [ESC] novamente agora para sair! <<          " -ForegroundColor Magenta
+            } else {
+                Write-Host " Digite qualquer tecla... (ESC 2x para sair, ou F12)                " -ForegroundColor DarkGray
+            }
+            $needRedraw = $false
         }
 
+        # Monitoramento em tempo real de teclas modificadoras (Shift, Caps, Ctrl, Alt) e barra ABNT2
+        $keyAvailable = $false
+        try { $keyAvailable = [Console]::KeyAvailable } catch { $keyAvailable = $false }
+
+        while (-not $keyAvailable) {
+            $mudou = $false
+
+            # 1. SHIFT (VK_SHIFT: 0x10, VK_LSHIFT: 0xA0, VK_RSHIFT: 0xA1)
+            try {
+                if (([Win32.WinKeyCheck]::GetAsyncKeyState(0x10) -band 0x8000) -ne 0 -or
+                    ([Win32.WinKeyCheck]::GetAsyncKeyState(0xA0) -band 0x8000) -ne 0 -or
+                    ([Win32.WinKeyCheck]::GetAsyncKeyState(0xA1) -band 0x8000) -ne 0) {
+                    if (-not $tested.ContainsKey('SHIFT')) {
+                        $tested['SHIFT'] = $true
+                        $lastKeyText = "[SHIFT] (Key: Shift)"
+                        $mudou = $true
+                    }
+                }
+            } catch {}
+
+            # 2. CAPS LOCK (VK_CAPITAL: 0x14 ou alternancia de [Console]::CapsLock)
+            try {
+                $curCaps = [Console]::CapsLock
+                if (([Win32.WinKeyCheck]::GetAsyncKeyState(0x14) -band 0x8000) -ne 0 -or $curCaps -ne $lastCapsState) {
+                    $lastCapsState = $curCaps
+                    if (-not $tested.ContainsKey('CAPS')) {
+                        $tested['CAPS'] = $true
+                        $lastKeyText = "[CAPS] (Key: CapsLock)"
+                        $mudou = $true
+                    }
+                }
+            } catch {}
+
+            # 3. CTRL (VK_CONTROL: 0x11, VK_LCONTROL: 0xA2, VK_RCONTROL: 0xA3)
+            try {
+                if (([Win32.WinKeyCheck]::GetAsyncKeyState(0x11) -band 0x8000) -ne 0) {
+                    if (-not $tested.ContainsKey('CTRL')) {
+                        $tested['CTRL'] = $true
+                        $lastKeyText = "[CTRL] (Key: Control)"
+                        $mudou = $true
+                    }
+                }
+            } catch {}
+
+            # 4. ALT (VK_MENU: 0x12)
+            try {
+                if (([Win32.WinKeyCheck]::GetAsyncKeyState(0x12) -band 0x8000) -ne 0) {
+                    if (-not $tested.ContainsKey('ALT')) {
+                        $tested['ALT'] = $true
+                        $lastKeyText = "[ALT] (Key: Alt)"
+                        $mudou = $true
+                    }
+                }
+            } catch {}
+
+            # 5. Barra ABNT2 (VK_ABNT_C1: 0xC1, VK_OEM_2: 0xBF, VK_DIVIDE: 0x6F)
+            try {
+                if (([Win32.WinKeyCheck]::GetAsyncKeyState(0xC1) -band 0x8000) -ne 0 -or
+                    ([Win32.WinKeyCheck]::GetAsyncKeyState(0xBF) -band 0x8000) -ne 0 -or
+                    ([Win32.WinKeyCheck]::GetAsyncKeyState(0x6F) -band 0x8000) -ne 0) {
+                    if (-not $tested.ContainsKey('/')) {
+                        $tested['/'] = $true
+                        $lastKeyText = "[/] (Key: Barra/Interrogacao)"
+                        $mudou = $true
+                    }
+                }
+            } catch {}
+
+            if ($mudou) {
+                $needRedraw = $true
+                break
+            }
+
+            Start-Sleep -Milliseconds 25
+            try { $keyAvailable = [Console]::KeyAvailable } catch { $keyAvailable = $true }
+        }
+
+        if ($needRedraw) {
+            continue
+        }
+
+        # Lê tecla do buffer
         $keyInfo = $null
         try {
             $keyInfo = [Console]::ReadKey($true)
@@ -1870,41 +1963,45 @@ function Testar-Teclado {
 
         $mapped = $null
 
-        # Tratamento de tecla
-        switch ($keyInfo.Key) {
-            'Escape' { $mapped = 'ESC' }
-            'Spacebar' { $mapped = 'ESPACO' }
-            'Enter' { $mapped = 'ENTER' }
-            'Backspace' { $mapped = 'BKSP' }
-            'Tab' { $mapped = 'TAB' }
-            'UpArrow' { $mapped = 'CIMA' }
-            'DownArrow' { $mapped = 'BAIXO' }
-            'LeftArrow' { $mapped = 'ESQ' }
-            'RightArrow' { $mapped = 'DIR' }
-            'OemMinus' { $mapped = '-' }
-            'OemPlus' { $mapped = '=' }
-            'OemComma' { $mapped = ',' }
-            'OemPeriod' { $mapped = '.' }
-            'Oem1' { $mapped = 'Ç' }
-            'Oem2' { $mapped = ';' }
-            'Oem4' { $mapped = '[' }
-            'Oem6' { $mapped = ']' }
-            'Oem7' { $mapped = '~' }
-            'OemQuestion' { $mapped = '/' }
-            'Capital' { $mapped = 'CAPS' }
-            default {
-                if ($keyInfo.Key.ToString() -match '^D(\d)$') {
-                    $mapped = $Matches[1]
-                } elseif ($keyInfo.Key.ToString() -match '^NumPad(\d)$') {
-                    $mapped = $Matches[1]
-                } else {
-                    $ch = $keyInfo.KeyChar.ToString().ToUpper()
-                    if ($ch -match '^[A-Z0-9Ç]$') {
-                        $mapped = $ch
+        # Mapeamento explicito para barra e interrogacao
+        if ($keyInfo.KeyChar -eq '/' -or $keyInfo.KeyChar -eq '?' -or $keyInfo.Key -eq 'OemQuestion' -or $keyInfo.Key -eq 'Divide' -or [int]$keyInfo.Key -eq 191 -or [int]$keyInfo.Key -eq 193) {
+            $mapped = '/'
+        }
+
+        if (-not $mapped) {
+            switch ($keyInfo.Key) {
+                'Escape' { $mapped = 'ESC' }
+                'Spacebar' { $mapped = 'ESPACO' }
+                'Enter' { $mapped = 'ENTER' }
+                'Backspace' { $mapped = 'BKSP' }
+                'Tab' { $mapped = 'TAB' }
+                'UpArrow' { $mapped = 'CIMA' }
+                'DownArrow' { $mapped = 'BAIXO' }
+                'LeftArrow' { $mapped = 'ESQ' }
+                'RightArrow' { $mapped = 'DIR' }
+                'OemMinus' { $mapped = '-' }
+                'OemPlus' { $mapped = '=' }
+                'OemComma' { $mapped = ',' }
+                'OemPeriod' { $mapped = '.' }
+                'Oem1' { $mapped = 'Ç' }
+                'Oem2' { $mapped = ';' }
+                'Capital' { $mapped = 'CAPS' }
+                default {
+                    if ($keyInfo.KeyChar -eq '/' -or $keyInfo.KeyChar -eq '?') {
+                        $mapped = '/'
+                    } elseif ($keyInfo.Key.ToString() -match '^D(\d)$') {
+                        $mapped = $Matches[1]
+                    } elseif ($keyInfo.Key.ToString() -match '^NumPad(\d)$') {
+                        $mapped = $Matches[1]
                     } else {
-                        $kName = $keyInfo.Key.ToString().ToUpper()
-                        if ($kName.Length -eq 1) {
-                            $mapped = $kName
+                        $ch = $keyInfo.KeyChar.ToString().ToUpper()
+                        if ($ch -match '^[A-Z0-9Ç]$') {
+                            $mapped = $ch
+                        } else {
+                            $kName = $keyInfo.Key.ToString().ToUpper()
+                            if ($kName.Length -eq 1) {
+                                $mapped = $kName
+                            }
                         }
                     }
                 }
@@ -1923,6 +2020,8 @@ function Testar-Teclado {
             $tested[$rawKey] = $true
             $lastKeyText = "[$rawKey]"
         }
+
+        $needRedraw = $true
     }
     try { [Console]::CursorVisible = $true } catch {}
 }
