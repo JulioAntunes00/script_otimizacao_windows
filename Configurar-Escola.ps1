@@ -29,7 +29,7 @@ $ProgressPreference = 'SilentlyContinue'
 # =====================================================================
 # 1. VARIAVEIS E LOGS
 # =====================================================================
-$SCRIPT_VERSAO = "2.3.0"
+$SCRIPT_VERSAO = "2.3.1"
 $LogFile = "$env:TEMP\Otimizacao_Escola.log"
 $dateStr = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 try {

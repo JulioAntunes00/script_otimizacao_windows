@@ -2,6 +2,8 @@
 *.bak
 *_backup*.ps1
 *backup*.ps1
+*BACKUP*
+*backup*
 
 # Logs e arquivos de teste/temporarios
 *.log
