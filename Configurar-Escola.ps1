@@ -31,7 +31,7 @@ $ProgressPreference = 'SilentlyContinue'
 # =====================================================================
 # 1. VARIAVEIS E LOGS
 # =====================================================================
-$SCRIPT_VERSAO = "2.2.0"
+$SCRIPT_VERSAO = "2.3.0"
 $LogFile = "$env:TEMP\Otimizacao_Escola.log"
 $dateStr = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 try {
@@ -282,7 +282,69 @@ function Gerenciar-PerfisInativos {
         return
     }
 
-    # Alerta na tela
+    # Se chamado pela Instalacao Padrao (SilenciosoSeVazio), executa fluxo rapido com timeout de 10s
+    if ($SilenciosoSeVazio) {
+        Clear-Host
+        Write-Host "=====================================================================" -ForegroundColor Yellow
+        Write-Host "            AVISO: PERFIS DE USUARIOS INATIVOS ENCONTRADOS           " -ForegroundColor Yellow
+        Write-Host "=====================================================================" -ForegroundColor Yellow
+        Write-Host " Foram detectados $($candidatos.Count) perfil(is) de aluno inativo(s) ha mais de 1 mes (30 dias):`n" -ForegroundColor Yellow
+
+        foreach ($cand in $candidatos) {
+            Write-Host "  -> $($cand.UserName) (Inativo ha $($cand.Dias) dias | Espaco: $($cand.Tamanho))" -ForegroundColor White
+        }
+
+        Write-Host "`n Administradores, BlueLab, alunos e contas da escola estao 100% protegidos." -ForegroundColor Green
+        Write-Host "=====================================================================`n" -ForegroundColor Yellow
+        Write-Host " [S] Deletar todos agora (Recomendado)" -ForegroundColor Cyan
+        Write-Host " [N] Pular (Manter perfis)`n" -ForegroundColor White
+
+        $tempoRestante = 10
+        $sw = [System.Diagnostics.Stopwatch]::StartNew()
+        $opcaoEscolhida = $null
+
+        while ($sw.Elapsed.TotalSeconds -lt 10) {
+            $seg = [math]::Max(0, 10 - [math]::Floor($sw.Elapsed.TotalSeconds))
+            Write-Host "`r Excluindo automaticamente em $seg segundo(s)... Pressione [N] para cancelar: " -NoNewline -ForegroundColor Yellow
+
+            $canCheck = $false
+            try { $canCheck = [Console]::KeyAvailable } catch { $canCheck = $false }
+            if ($canCheck) {
+                $tecla = [Console]::ReadKey($true)
+                $charKey = $tecla.KeyChar.ToString().ToUpper()
+                if ($charKey -eq "N") {
+                    $opcaoEscolhida = "N"
+                    break
+                } elseif ($charKey -eq "S" -or $tecla.Key -eq "Enter") {
+                    $opcaoEscolhida = "S"
+                    break
+                }
+            }
+            Start-Sleep -Milliseconds 150
+        }
+        $sw.Stop()
+
+        if ($opcaoEscolhida -eq "N") {
+            Write-Host "`n`n >> Exclusao cancelada pelo operador. Mantendo perfis intactos..." -ForegroundColor Gray
+            Start-Sleep -Seconds 1
+            return
+        }
+
+        Write-Host "`n`n >> Excluindo $($candidatos.Count) perfil(is) inativo(s)..." -ForegroundColor Cyan
+        foreach ($item in $candidatos) {
+            try {
+                $item.Perfil | Remove-CimInstance -ErrorAction Stop
+                Write-Step -Text "Perfil '$($item.UserName)' removido com sucesso" -Status "OK"
+            } catch {
+                Write-Step -Text "Falha ao remover perfil '$($item.UserName)' ($($_.Exception.Message))" -Status "AVISO"
+            }
+        }
+        Write-Host "`n >> Exclusao finalizada. Prosseguindo com as otimizacoes...`n" -ForegroundColor Green
+        Start-Sleep -Milliseconds 800
+        return
+    }
+
+    # Caso chamado diretamente pelo Menu [5] (Modo Manual Completo com Selecao por [X])
     Clear-Host
     Write-Host "=====================================================================" -ForegroundColor Yellow
     Write-Host "            AVISO: PERFIS DE USUARIOS INATIVOS ENCONTRADOS           " -ForegroundColor Yellow
@@ -384,7 +446,7 @@ function Gerenciar-PerfisInativos {
                             Write-Step -Text "Falha ao remover perfil '$($item.UserName)' ($($_.Exception.Message))" -Status "AVISO"
                         }
                     }
-                    Write-Host "`n Exclusao concluida! Pressione Enter para prosseguir..." -ForegroundColor Green
+                    Write-Host "`n Exclusao concluida! Pressione Enter para voltar..." -ForegroundColor Green
                     Read-Host
                 } else {
                     Write-Host "`n Exclusao cancelada pelo operador." -ForegroundColor Gray
